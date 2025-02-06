@@ -1,12 +1,8 @@
-import {Request, Response, Router} from 'express'
-import {db} from '../db/db'
-import {PostDBType} from "../Data Types/PostDBType";
-import {BlogsRepo} from "../Repositories/BlogsRepo";
+import {Request, Response} from 'express'
 import {PostRepo} from "../Repositories/PostsRepo";
 
-export const postRouter = Router();
 
-const postsController= {
+export const postsController= {
     getPosts: (req: Request, res: Response) => {
         res.status(200).json(PostRepo.ShowAllPosts())
     },
@@ -36,10 +32,3 @@ const postsController= {
     }
 }
 
-
-
-postRouter.get('/', postsController.getPosts)
-postRouter.get('/:id', postsController.getPostByID)
-postRouter.post('/', postsController.createPost)
-postRouter.delete('/:id', postsController.deletePost)
-postRouter.put('/:id', postsController.updatePost)

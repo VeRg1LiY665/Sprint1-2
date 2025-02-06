@@ -8,7 +8,7 @@ export type DBType = {
 
 export const db: DBType = {
     blogs: [],
-    posts: []
+    posts: [],
 }
 
 export const setDB = (blogset?: BlogDBType, postset?: PostDBType) => {

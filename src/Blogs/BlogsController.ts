@@ -1,13 +1,14 @@
-import {Request, Response, Router} from 'express'
-import {db} from '../db/db'
-import {BlogDBType} from "../Data Types/BlogDBType";
+import {Request, Response, Router} from 'express';
 import {BlogsRepo} from "../Repositories/BlogsRepo";
 
-export const blogRouter = Router();
 
-const blogsController= {
+
+//export const blogRouter = Router();
+
+export const blogsController= {
     getBlogs: (req: Request, res: Response) => {
-        res.status(200).json(BlogsRepo.ShowAllBlogs())
+        const AllBlogs = BlogsRepo.ShowAllBlogs()
+        res.status(200).json(AllBlogs)
     },
 
     getBlogByID: (req: Request, res: Response) => {
@@ -24,27 +25,13 @@ const blogsController= {
     },
 
     createBlog: (req: Request, res: Response) => {
-
-
-
             res.status(201).json(BlogsRepo.SetUpNewBlog(req.body));
             return
-
-
     },
 
     updateBlog: (req: Request, res: Response) => {
-       const AlterFlag = BlogsRepo.ChangeBlog(req.params.id, req.body);
+        const AlterFlag = BlogsRepo.ChangeBlog(req.params.id, req.body);
        (AlterFlag) ? res.status(204).json('Succesful update'): res.status(404).json('Not found');
         }
-
     }
 
-
-
-
-blogRouter.get('/', blogsController.getBlogs)
-blogRouter.get('/:id', blogsController.getBlogByID)
-blogRouter.post('/', blogsController.createBlog)
-blogRouter.delete('/:id', blogsController.deleteBlog)
-blogRouter.put('/:id', blogsController.updateBlog)

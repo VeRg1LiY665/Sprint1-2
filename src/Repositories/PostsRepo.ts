@@ -19,13 +19,14 @@ export const PostRepo = {
         db.posts= db.posts.filter((c: PostDBType)  => c.id !== id)
         return true;
     },
-    SetUpNewPost(content:InputPostType): PostDBType {
+    SetUpNewPost(content:InputPostType) {
 
         const post = {
             ...content,
             id: (Math.floor(Date.now() + Math.random())).toString(),
-            blogName: BlogsRepo.ShowBlogByID(content.blogId).name
+            blogName: BlogsRepo.ShowBlogByID(content.blogId)!.name
         }
+
         db.posts.push(post)
         return post
     },
@@ -42,7 +43,7 @@ export const PostRepo = {
                 ...content,
             }
             if (content.blogId !== db.posts[index].id) {
-                blog.blogName =  BlogsRepo.ShowBlogByID(content.blogId).name
+                blog.blogName =  BlogsRepo.ShowBlogByID(content.blogId)!.name
             }
             db.posts[index] = blog
             return true
