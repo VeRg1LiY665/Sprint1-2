@@ -37,15 +37,15 @@ export const PostRepo = {
             return false
         }
         else {
-            const blog = {
+            const post = {
                 ...db.posts[index],
 
                 ...content,
             }
-            if (content.blogId !== db.posts[index].id) {
-                blog.blogName =  BlogsRepo.ShowBlogByID(content.blogId)!.name
+            if (content.blogId !== db.posts[index].blogId) {
+                post.blogName =  BlogsRepo.ShowBlogByID(content.blogId)!.name
             }
-            db.posts[index] = blog
+            db.posts[index] = post
             return true
         }
     }

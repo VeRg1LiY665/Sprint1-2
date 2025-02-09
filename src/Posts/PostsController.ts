@@ -28,7 +28,7 @@ export const postsController= {
 
     updatePost: (req: Request, res: Response) => {
         const AlterFlag = PostRepo.ChangePost(req.params.id, req.body);
-        (AlterFlag) ? res.status(204).json('Succesful update'): res.status(404).json('Not found');
+        (AlterFlag) ? res.status(204).json('Successful update'): res.status(404).json('Error: post not found');
     }
 }
 

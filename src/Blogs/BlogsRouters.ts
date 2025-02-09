@@ -4,19 +4,19 @@ import {
     BlogNameValidation,
     BlogUrlLengthValidation,
     BlogUrlValidation,
-    IdValidation,
-    InputValidationMiddleware
+    ErrorCollectionMiddleware
 } from "./BlogsMiddlewares";
 import {Router} from "express";
+import {authMiddleware} from "../Auth/BasicAuth";
 
 export const blogRouter = Router();
 
 blogRouter.get('/', blogsController.getBlogs)
 
-blogRouter.get('/:id', IdValidation, blogsController.getBlogByID)
+blogRouter.get('/:id', blogsController.getBlogByID)
 
-blogRouter.post('/', BlogNameValidation, BlogDescriptionValidation, BlogUrlLengthValidation, BlogUrlValidation, InputValidationMiddleware, blogsController.createBlog)
+blogRouter.post('/',authMiddleware, BlogNameValidation, BlogDescriptionValidation, BlogUrlLengthValidation, BlogUrlValidation, ErrorCollectionMiddleware, blogsController.createBlog)
 
-blogRouter.delete('/:id', IdValidation, blogsController.deleteBlog)
+blogRouter.delete('/:id',authMiddleware, blogsController.deleteBlog)
 
-blogRouter.put('/:id',BlogNameValidation, BlogDescriptionValidation, BlogUrlLengthValidation, BlogUrlValidation, IdValidation, InputValidationMiddleware, blogsController.updateBlog)
+blogRouter.put('/:id',authMiddleware, BlogNameValidation, BlogDescriptionValidation, BlogUrlLengthValidation, BlogUrlValidation, ErrorCollectionMiddleware, blogsController.updateBlog)

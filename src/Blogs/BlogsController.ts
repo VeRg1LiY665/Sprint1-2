@@ -1,10 +1,6 @@
 import {Request, Response, Router} from 'express';
 import {BlogsRepo} from "../Repositories/BlogsRepo";
 
-
-
-//export const blogRouter = Router();
-
 export const blogsController= {
     getBlogs: (req: Request, res: Response) => {
         const AllBlogs = BlogsRepo.ShowAllBlogs()
@@ -31,7 +27,7 @@ export const blogsController= {
 
     updateBlog: (req: Request, res: Response) => {
         const AlterFlag = BlogsRepo.ChangeBlog(req.params.id, req.body);
-       (AlterFlag) ? res.status(204).json('Succesful update'): res.status(404).json('Not found');
+       (AlterFlag) ? res.status(204).json('Successful update'): res.status(404).json('Error: blog not found');
         }
     }
 

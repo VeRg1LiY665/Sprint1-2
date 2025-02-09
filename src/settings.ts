@@ -6,5 +6,7 @@ export const SETTINGS = {
     PATH: {
         BLOGS: '/blogs',
         POSTS: '/posts'
-    }
+    },
+    PASS: process.env.PASSWORD,
+    LOGIN: process.env.LOGIN
 }

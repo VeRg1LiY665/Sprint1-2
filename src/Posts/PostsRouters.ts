@@ -8,14 +8,15 @@ import {
 } from "./PostsMiddlewares";
 
 import {Router} from "express";
+import {authMiddleware} from "../Auth/BasicAuth";
 export const postRouter = Router();
 
 postRouter.get('/', postsController.getPosts)
 
 postRouter.get('/:id', postsController.getPostByID)
 
-postRouter.post('/', PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, BlogIdValidation, InputValidationMiddleware, postsController.createPost)
+postRouter.post('/', authMiddleware, PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, BlogIdValidation, InputValidationMiddleware, postsController.createPost)
 
-postRouter.delete('/:id', postsController.deletePost)
+postRouter.delete('/:id', authMiddleware, postsController.deletePost)
 
-postRouter.put('/:id', PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, BlogIdValidation, InputValidationMiddleware, postsController.updatePost)
+postRouter.put('/:id', authMiddleware, PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, BlogIdValidation, InputValidationMiddleware, postsController.updatePost)

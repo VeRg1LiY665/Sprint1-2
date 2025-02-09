@@ -1,6 +1,7 @@
 import {db} from '../db/db'
 import {BlogDBType} from "../Data Types/BlogDBType"
 import {InputBlogType} from "../IO Types/InputBlogType";
+import {PostDBType} from "../Data Types/PostDBType";
 
 export const BlogsRepo = {
     ShowAllBlogs () {
@@ -37,7 +38,9 @@ export const BlogsRepo = {
                 ...db.blogs[index],
                 ...content,
             }
+            db.posts.forEach((c: PostDBType) => { if (c.blogName === db.blogs[index].name){c.blogName=content.name} })
             db.blogs[index] = blog
+
             return true
         }
     }
