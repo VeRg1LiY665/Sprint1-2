@@ -4,34 +4,34 @@ import {InputPostType} from "../IO Types/InputPostType";
 import {BlogsRepo} from "./BlogsRepo";
 
 export const PostRepo = {
-    ShowAllPosts () {
-        return db.posts
+    async ShowAllPosts () {
+        return await db.posts
     },
-    ShowPostByID (id:string) {
-        const FoundBlog = db.posts.find((c: PostDBType) => c.id === id)
+    async ShowPostByID (id:string) {
+        const FoundBlog = await db.posts.find((c: PostDBType) => c.id === id)
         return FoundBlog
     },
-    DeletePost (id:string) {
-        const flag = db.posts.find((c:PostDBType)=>c.id=== id)
+    async DeletePost (id:string) {
+        const flag = await db.posts.find((c:PostDBType)=>c.id=== id)
         if(!flag) {
             return false;
         }
-        db.posts= db.posts.filter((c: PostDBType)  => c.id !== id)
+        db.posts= await db.posts.filter((c: PostDBType)  => c.id !== id)
         return true;
     },
-    SetUpNewPost(content:InputPostType) {
+    async SetUpNewPost(content:InputPostType) {
 
         const post = {
             ...content,
             id: (Math.floor(Date.now() + Math.random())).toString(),
-            blogName: BlogsRepo.ShowBlogByID(content.blogId)!.name
+            blogName: await BlogsRepo.ShowBlogByID(content.blogId)!.name
         }
 
-        db.posts.push(post)
+        await db.posts.push(post)
         return post
     },
-    ChangePost (id: string, content:InputPostType) {
-        const index = db.posts.findIndex((c: PostDBType) => c.id === id)
+    async ChangePost (id: string, content:InputPostType) {
+        const index = await db.posts.findIndex((c: PostDBType) => c.id === id)
 
         if (index < 0) {
             return false
