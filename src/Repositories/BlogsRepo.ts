@@ -8,10 +8,9 @@ export const BlogsRepo = {
         const allblogs = await db.blogs
         return allblogs
     },
-    async ShowBlogByID (id:string):Promise<BlogDBType> {
+    async ShowBlogByID (id:string) {
         const FoundBlog = await db.blogs.find((c: BlogDBType) => c.id === id)
-        if (FoundBlog) {return FoundBlog}
-        return
+        return FoundBlog
     },
     async DeleteBlog (id:string) {
         const flag = await db.blogs.find((c:BlogDBType)=>c.id=== id)

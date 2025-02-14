@@ -1,4 +1,4 @@
-import {body, param, ValidationChain, validationResult} from "express-validator";
+import {body, ValidationChain, validationResult} from "express-validator";
 import {Request,Response,NextFunction} from "express";
 
 
@@ -15,12 +15,6 @@ export const BlogUrlLengthValidation:ValidationChain =body ('websiteUrl').trim()
 export const BlogUrlValidation:ValidationChain =body ('websiteUrl').matches(/^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/).withMessage(
     {message: 'Not a valid URL',field: 'websiteUrl'})
 
-/*export const IdValidation:ValidationChain = param('id').custom(value => {
-    const existingId = db.blogs.find((c:BlogDBType)=>c.id=== value.id);
-    if (!existingId) {
-        throw new Error('Blog ID does not exist');
-    }
-})*/
 
 export const ErrorCollectionMiddleware = (req:Request, res: Response, next:NextFunction) => {
     const errors = validationResult(req).formatWith(({msg}) => msg).array({ onlyFirstError: true });

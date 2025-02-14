@@ -8,8 +8,7 @@ export const PostRepo = {
         return await db.posts
     },
     async ShowPostByID (id:string) {
-        const FoundBlog = await db.posts.find((c: PostDBType) => c.id === id)
-        return FoundBlog
+        return await db.posts.find((c: PostDBType) => c.id === id)
     },
     async DeletePost (id:string) {
         const flag = await db.posts.find((c:PostDBType)=>c.id=== id)
@@ -20,11 +19,11 @@ export const PostRepo = {
         return true;
     },
     async SetUpNewPost(content:InputPostType) {
-
+        const foundBlog = await BlogsRepo.ShowBlogByID(content.blogId)
         const post = {
             ...content,
             id: (Math.floor(Date.now() + Math.random())).toString(),
-            blogName: await BlogsRepo.ShowBlogByID(content.blogId)!.name
+            blogName: foundBlog!.name
         }
 
         await db.posts.push(post)
@@ -32,7 +31,7 @@ export const PostRepo = {
     },
     async ChangePost (id: string, content:InputPostType) {
         const index = await db.posts.findIndex((c: PostDBType) => c.id === id)
-
+        const foundBlog = await BlogsRepo.ShowBlogByID(content.blogId)
         if (index < 0) {
             return false
         }
@@ -43,7 +42,7 @@ export const PostRepo = {
                 ...content,
             }
             if (content.blogId !== db.posts[index].blogId) {
-                post.blogName =  BlogsRepo.ShowBlogByID(content.blogId)!.name
+                post.blogName =  foundBlog!.name
             }
             db.posts[index] = post
             return true

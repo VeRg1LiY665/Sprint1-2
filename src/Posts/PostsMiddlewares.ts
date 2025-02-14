@@ -1,8 +1,8 @@
 import {db} from "../db/db";
-import {body, param, validationResult} from "express-validator";
+import {body, validationResult} from "express-validator";
 import {Request,Response, NextFunction} from "express";
 import {BlogDBType} from "../Data Types/BlogDBType";
-import {PostDBType} from "../Data Types/PostDBType";
+
 
 
 export const PostTitleValidation =body ('title').trim().isLength({min:1, max:30}).withMessage(
@@ -18,12 +18,6 @@ export const BlogIdValidation = body('blogId').custom(value => {
     return db.blogs.find((c:BlogDBType)=>c.id=== value);
 }).withMessage({message: 'Blog ID does not exist',field: 'blogId'})
 
-/*export const IdValidation = param('id').custom(value => {
-    const existingId = db.posts.find((c:PostDBType)=>c.id=== value.id);
-    if (!existingId) {
-        throw new Error();
-    }
-}).withMessage({message: 'Post ID does not exist',field: 'blogId'})*/
 
 export const InputValidationMiddleware = (req:Request, res: Response, next:NextFunction) => {
     const result = validationResult(req).formatWith(({msg}) => msg).array({ onlyFirstError: true });

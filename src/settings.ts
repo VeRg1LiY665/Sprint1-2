@@ -8,5 +8,7 @@ export const SETTINGS = {
         POSTS: '/posts'
     },
     PASS: process.env.PASSWORD,
-    LOGIN: process.env.LOGIN
+    LOGIN: process.env.LOGIN,
+    DB_NAME: process.env.DB_NAME || 'test',
+    MONGO_URL: process.env.MONGO_URL as string,
 }

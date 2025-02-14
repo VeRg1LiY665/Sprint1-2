@@ -89,4 +89,21 @@ describe('/posts', () => {
             .expect(401)
 
     })
+
+    it('Blog ID doesnt exist', async () => {
+        setDB(datasetblog)
+        const newPost: InputPostType = {
+            title: 'string',
+            shortDescription: 'string',
+            content: 'string',
+            blogId: '123745'
+        }
+
+        const res = await req
+            .post(SETTINGS.PATH.POSTS)
+            .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
+            .send(newPost) // отправка данных
+            .expect(400)
+
+    })
 })
