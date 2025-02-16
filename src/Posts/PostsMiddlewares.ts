@@ -1,7 +1,8 @@
-import {db} from "../db/db";
 import {body, validationResult} from "express-validator";
 import {Request,Response, NextFunction} from "express";
-import {BlogDBType} from "../Data Types/BlogDBType";
+import {blogsCollection} from "../db/mongoDB";
+import mongoose from "mongoose";
+import {ObjectId} from "mongodb";
 
 
 
@@ -14,9 +15,13 @@ export const PostShortDescriptionValidation =body ('shortDescription').trim().is
 export const PostContentValidation = body ('content').trim().isLength({min:1,max:1000}).withMessage(
     {message: 'content length should be within 1 to 1000 characters',field: 'content'})
 
-export const BlogIdValidation = body('blogId').custom(value => {
-    return db.blogs.find((c:BlogDBType)=>c.id=== value);
-}).withMessage({message: 'Blog ID does not exist',field: 'blogId'})
+export const BlogIdValidation = body('blogId').custom(async (value:string) => {
+    const _id = new ObjectId(value)
+    const foundBlog = await blogsCollection.findOne({_id : _id})
+    console.log(foundBlog)
+    return (foundBlog)
+
+}).withMessage({message: 'Incorrect Blog ID',field: 'blogId'})
 
 
 export const InputValidationMiddleware = (req:Request, res: Response, next:NextFunction) => {
@@ -26,4 +31,12 @@ export const InputValidationMiddleware = (req:Request, res: Response, next:NextF
         return;
     }
     else {next()}
+}
+export const BlogIdValidationMiddleware = async (req:Request, res: Response, next:NextFunction) => {
+    if (!mongoose.isValidObjectId(req.body.blogId))
+    {    if (await blogsCollection.findOne({_id : new ObjectId(req.body.blogId)}))
+    {res.status(400).json('BlodId is incorrect');return}
+        next()
+    }
+    else next()
 }

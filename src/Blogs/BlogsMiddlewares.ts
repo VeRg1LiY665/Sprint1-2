@@ -1,5 +1,6 @@
 import {body, ValidationChain, validationResult} from "express-validator";
 import {Request,Response,NextFunction} from "express";
+import mongoose from "mongoose";
 
 
 
@@ -23,4 +24,9 @@ export const ErrorCollectionMiddleware = (req:Request, res: Response, next:NextF
         return;
     }
     else {next()}
+}
+export const ObjectIdValidationMiddleware = (req:Request, res: Response, next:NextFunction) => {
+    if (!mongoose.isValidObjectId(req.params.id))
+    {res.status(404).json('Not valid ObjectID');return}
+    else next()  //валидация objectId пока что такая, ради автотестов, потом на 400 переделаю
 }

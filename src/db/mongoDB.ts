@@ -4,12 +4,15 @@ import {BlogDBType} from "../Data Types/BlogDBType";
 import {SETTINGS} from "../settings";
 
 
-export let postsCollection = Collection<PostDBType>
-export let blogsCollection = Collection<BlogDBType>
+export let postsCollection: Collection<PostDBType>
+export let blogsCollection: Collection<BlogDBType>
 
 export async function runDB(url:string):Promise<boolean> {
     let client = new MongoClient(url);
     let db = client.db(SETTINGS.DB_NAME)
+
+    blogsCollection = db.collection<BlogDBType>(SETTINGS.PATH.BLOGS);
+    postsCollection = db.collection<PostDBType>(SETTINGS.PATH.POSTS);
 
 try {
         await client.connect();

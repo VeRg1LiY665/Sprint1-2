@@ -1,49 +1,61 @@
-import {db} from '../db/db'
-import {BlogDBType} from "../Data Types/BlogDBType"
 import {InputBlogType} from "../IO Types/InputBlogType";
-import {PostDBType} from "../Data Types/PostDBType";
+import {blogsCollection, postsCollection} from "../db/mongoDB";
+import {ObjectId} from "mongodb";
+import {BlogDBType} from "../Data Types/BlogDBType";
+import {BlogOutputType} from "../IO Types/BlogOutputType";
 
 export const BlogsRepo = {
     async ShowAllBlogs () {
-        const allblogs = await db.blogs
-        return allblogs
+        const allblogs = await blogsCollection.find().toArray();
+        return allblogs.map(el=> ({
+            id:el._id, name: el.name,
+            description : el.description,
+            websiteUrl : el.websiteUrl,
+            createdAt : el.createdAt,
+            isMembership : el.isMembership}))
     },
     async ShowBlogByID (id:string) {
-        const FoundBlog = await db.blogs.find((c: BlogDBType) => c.id === id)
-        return FoundBlog
-    },
+        const _id = new ObjectId(id)
+        const blog = await blogsCollection.findOne({_id : _id});
+    if(!blog) { return null}
+        return this.mapToOutput(blog)
+        },
     async DeleteBlog (id:string) {
-        const flag = await db.blogs.find((c:BlogDBType)=>c.id=== id)
-        if(!flag) {
-            return false;
-        }
-        db.blogs= await db.blogs.filter((c: BlogDBType)  => c.id !== id)
-        return true;
+        const res = await blogsCollection.deleteOne({_id : new ObjectId(id)})
+        return res.deletedCount === 1;
     },
     async SetUpNewBlog(content:InputBlogType) {
         const blog = {
             ...content,
-            id: (Math.floor(Date.now() + Math.random())).toString(),
+            _id: new ObjectId(),
+            isMembership: false,
+            createdAt: new Date().toISOString(),
         }
-        await db.blogs.push(blog)
-        return blog
+        await blogsCollection.insertOne(blog)
+
+        return this.mapToOutput(blog)
     },
     async ChangeBlog (id: string, content:InputBlogType) {
-        const index = await db.blogs.findIndex((c: BlogDBType) => c.id === id)
 
-        if (index < 0) {
-            return false
+        const res = await blogsCollection.updateOne(
+            {_id: new ObjectId(id)},
+            {$set:{...content}}
+        )
+        await postsCollection.updateMany(
+            {blogId:id},
+            {$set:{blogName:content.name}}
+        )
+            return res.matchedCount === 1;
+    },
+
+    mapToOutput(blog: BlogDBType): BlogOutputType {
+        return {
+            id : (blog._id).toString(),
+            name: blog.name,
+            description : blog.description,
+            websiteUrl : blog.websiteUrl,
+            createdAt : blog.createdAt,
+            isMembership : blog.isMembership,
         }
-        else {
-            const blog = {
-                ...db.blogs[index],
-                ...content,
-            }
-            await db.posts.forEach((c: PostDBType) => { if (c.blogName === db.blogs[index].name){c.blogName=content.name} })
-            db.blogs[index] = await blog
-
-            return true
         }
-    }
-
 }

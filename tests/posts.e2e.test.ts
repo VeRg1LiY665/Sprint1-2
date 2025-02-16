@@ -8,7 +8,7 @@ import {InputPostType} from "../src/IO Types/InputPostType";
 
 describe('/posts', () => {
     beforeAll(async () => { // очистка базы данных перед началом тестирования
-         setDB()
+         //setDB()
      })
 
     it('should get empty array', async () => {
@@ -91,12 +91,12 @@ describe('/posts', () => {
     })
 
     it('Blog ID doesnt exist', async () => {
-        setDB(datasetblog)
+        //setDB(datasetblog)
         const newPost: InputPostType = {
             title: 'string',
             shortDescription: 'string',
             content: 'string',
-            blogId: '123745'
+            blogId: '63189b06003380064c4193be'
         }
 
         const res = await req

@@ -1,6 +1,6 @@
 import {postsController} from "./PostsController";
 import {
-    BlogIdValidation,
+    BlogIdValidation, BlogIdValidationMiddleware,
     InputValidationMiddleware,
     PostContentValidation,
     PostShortDescriptionValidation,
@@ -9,14 +9,15 @@ import {
 
 import {Router} from "express";
 import {authMiddleware} from "../Auth/BasicAuth";
+import {ObjectIdValidationMiddleware} from "../Blogs/BlogsMiddlewares";
 export const postRouter = Router();
 
 postRouter.get('/', postsController.getPosts)
 
-postRouter.get('/:id', postsController.getPostByID)
+postRouter.get('/:id', ObjectIdValidationMiddleware, postsController.getPostByID)
 
 postRouter.post('/', authMiddleware, PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, BlogIdValidation, InputValidationMiddleware, postsController.createPost)
 
-postRouter.delete('/:id', authMiddleware, postsController.deletePost)
+postRouter.delete('/:id', authMiddleware, ObjectIdValidationMiddleware, postsController.deletePost)
 
-postRouter.put('/:id', authMiddleware, PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, BlogIdValidation, InputValidationMiddleware, postsController.updatePost)
+postRouter.put('/:id', authMiddleware, PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, BlogIdValidation, InputValidationMiddleware, ObjectIdValidationMiddleware, postsController.updatePost)

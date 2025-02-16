@@ -1,21 +1,25 @@
 import {DBType, } from '../src/db/db'
 import {BlogDBType} from "../src/Data Types/BlogDBType";
 import {PostDBType} from "../src/Data Types/PostDBType";
+import {ObjectId} from "mongodb";
 
 // готовые данные для переиспользования в тестах
 
 export const datasetblog: BlogDBType = {
-    id: '543134656',
+    _id: new ObjectId(),
     name: 'blogname',
     description: 'Blog description',
-    websiteUrl: 'https://www.validurl.com'
+    websiteUrl: 'https://www.validurl.com',
+    createdAt: new Date().toISOString(),
+    isMembership: false
 }
 
 export const datasetpost: PostDBType = {
-    id: '564635496821',
+    _id: new ObjectId(),
     title: 'Post title',
     shortDescription: 'Post description',
     content: 'Post content',
-    blogId: '543134656',
-    blogName: 'blogname'
+    blogId: datasetblog._id.toString(),
+    blogName: 'blogname',
+    createdAt: new Date().toISOString(),
 }

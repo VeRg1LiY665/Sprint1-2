@@ -8,9 +8,9 @@ export const blogsController= {
     },
 
     getBlogByID: async (req: Request, res: Response) => {
-       const result = await BlogsRepo.ShowBlogByID(req.params.id)
+        const result = await BlogsRepo.ShowBlogByID(req.params.id)
         if (!result) {
-            res.status(404).json('Error: blog not found')
+            res.status(404).json( 'Error: blog not found')
             return
         }
         res.status(200).json(result)
