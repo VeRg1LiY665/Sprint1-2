@@ -18,8 +18,7 @@ export const PostContentValidation = body ('content').trim().isLength({min:1,max
 export const BlogIdValidation = body('blogId').custom(async (value:string) => {
     const _id = new ObjectId(value)
     const foundBlog = await blogsCollection.findOne({_id : _id})
-    console.log(foundBlog)
-    return (foundBlog)
+    if(!foundBlog){throw new Error()}
 
 }).withMessage({message: 'Incorrect Blog ID',field: 'blogId'})
 
@@ -34,7 +33,7 @@ export const InputValidationMiddleware = (req:Request, res: Response, next:NextF
 }
 export const BlogIdValidationMiddleware = async (req:Request, res: Response, next:NextFunction) => {
     if (!mongoose.isValidObjectId(req.body.blogId))
-    {    if (await blogsCollection.findOne({_id : new ObjectId(req.body.blogId)}))
+    {    if (!await blogsCollection.findOne({_id : new ObjectId(req.body.blogId)}))
     {res.status(400).json('BlodId is incorrect');return}
         next()
     }
