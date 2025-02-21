@@ -17,9 +17,20 @@ export const BlogsQRepo = {
         return this.mapToOutput(blog)
     },
 
+    async ShowPostsForBlog(id: string) {
+        const _id = new ObjectId(id)
+        const posts = await blogsCollection.find({_id:_id}).toArray();
+        if (!posts) {
+            return null
+        }
+        return posts.map(el=> (this.mapToOutput(el)))
+
+    },
+
+
     mapToOutput(blog: BlogDBType): BlogOutputType {
         let MappedBlog:any = {id : (blog._id).toString(), ...blog}
         delete MappedBlog._id
         return MappedBlog as BlogOutputType
-    }
+    },
 }

@@ -1,14 +1,15 @@
 import {Request, Response} from 'express'
-import {PostRepo} from "../Repositories/PostsRepo";
+import {PostsRepo} from "../Repositories/PostsRepo";
+import {PostsQRepo} from "../Repositories/PostsQRepo";
 
 
 export const postsController= {
     getPosts: async (req: Request, res: Response) => {
-        res.status(200).json(await PostRepo.ShowAllPosts())
+        res.status(200).json(await PostsQRepo.ShowAllPosts())
     },
 
     getPostByID: async (req: Request, res: Response) => {
-        const result = await PostRepo.ShowPostByID(req.params.id)
+        const result = await PostsQRepo.ShowPostByID(req.params.id)
         if (!result) {
             res.status(404).json('Error: post not found')
             return
@@ -18,16 +19,16 @@ export const postsController= {
     },
 
     deletePost: async (req: Request, res: Response) => {
-        (await PostRepo.DeletePost(req.params.id)) ? res.sendStatus(204) : res.status(404).json('Error: post not found')
+        (await PostsRepo.DeletePost(req.params.id)) ? res.sendStatus(204) : res.status(404).json('Error: post not found')
     },
 
     createPost: async (req: Request, res: Response) => {
-        res.status(201).json(await PostRepo.SetUpNewPost(req.body));
+        res.status(201).json(await PostsRepo.SetUpNewPost(req.body));
             return
     },
 
     updatePost: async (req: Request, res: Response) => {
-        const AlterFlag = await PostRepo.ChangePost(req.params.id, req.body);
+        const AlterFlag = await PostsRepo.ChangePost(req.params.id, req.body);
         (AlterFlag) ? res.status(204).json('Successful update'): res.status(404).json('Error: post not found');
     }
 }

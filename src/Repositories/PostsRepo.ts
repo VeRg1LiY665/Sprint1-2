@@ -4,32 +4,17 @@ import {postsCollection} from "../db/mongoDB";
 import {ObjectId} from "mongodb";
 import {PostDBType} from "../Data Types/PostDBType";
 import {PostOutputType} from "../IO Types/PostOutputType";
+import {BlogsQRepo} from "./BlogsQRepo";
+import {PostsQRepo} from "./PostsQRepo";
 
-export const PostRepo = {
-    async ShowAllPosts () {
-        const allPosts = await (postsCollection.find().toArray())
-        return allPosts.map(el=> ({
-            id : (el._id).toString(),
-            title: el.title,
-            shortDescription : el.shortDescription,
-            content : el.content,
-            blogId : el.blogId,
-            blogName : el.blogName,
-            createdAt: el.createdAt,
-        }))
-    },
-    async ShowPostByID (id:string) {
-        const _id = new ObjectId(id)
-        const post= await postsCollection.findOne({_id : new ObjectId(id)})
-        if(!post) { return null}
-        return this.mapToOutput(post)
-    },
+export const PostsRepo = {
+
     async DeletePost (id:string) {
         const res = await postsCollection.deleteOne({_id : new ObjectId(id)})
         return res.deletedCount === 1;
     },
     async SetUpNewPost(content:InputPostType) {
-        const foundBlog = await BlogsRepo.ShowBlogByID(content.blogId)
+        const foundBlog = await BlogsQRepo.ShowBlogByID(content.blogId)
         const post = {
             ...content,
             _id: new ObjectId(),
@@ -40,6 +25,20 @@ export const PostRepo = {
         await postsCollection.insertOne(post)
         return this.mapToOutput(post)
     },
+
+    async SetUpNewPostForBlog(content:InputPostType){
+        const foundBlog = await BlogsQRepo.ShowBlogByID(content.blogId)
+        const post = {
+            ...content,
+            _id: new ObjectId(),
+            blogName: foundBlog!.name,
+            createdAt: new Date().toISOString(),
+        }
+
+        await postsCollection.insertOne(post)
+        return this.mapToOutput(post)
+    },
+
     async ChangePost (id: string, content:InputPostType) {
 
         const res = await postsCollection.updateOne(
@@ -47,8 +46,8 @@ export const PostRepo = {
             {$set:{...content}}
         )
 if (res.matchedCount === 1) {
-    const foundBlog = await BlogsRepo.ShowBlogByID(content.blogId)
-    const origPost = await this.ShowPostByID(id)
+    const foundBlog = await BlogsQRepo.ShowBlogByID(content.blogId)
+    const origPost = await PostsQRepo.ShowPostByID(id)
 
     let updBlogName = {blogName: origPost!.blogName}
     if (content.blogId !== origPost!.blogId) {

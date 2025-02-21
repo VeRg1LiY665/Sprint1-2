@@ -5,30 +5,15 @@ import {BlogDBType} from "../Data Types/BlogDBType";
 import {BlogOutputType} from "../IO Types/BlogOutputType";
 
 export const BlogsRepo = {
-    async ShowAllBlogs () {
-        const AllBlogs = await blogsCollection.find().toArray();
-        return AllBlogs.map(el=> (this.mapToOutput(el)))
-    },
-    async ShowBlogByID (id:string) {
-        const _id = new ObjectId(id)
-        const blog = await blogsCollection.findOne({_id : _id});
-    if(!blog) { return null}
-        return this.mapToOutput(blog)
-        },
+
     async DeleteBlog (id:string) {
         const res = await blogsCollection.deleteOne({_id : new ObjectId(id)})
         return res.deletedCount === 1;
     },
-    async SetUpNewBlog(content:InputBlogType) {
-        const blog = {
-            ...content,
-            _id: new ObjectId(),
-            isMembership: false,
-            createdAt: new Date().toISOString(),
-        }
-        await blogsCollection.insertOne(blog)
+    async SetUpNewBlog(blog:BlogDBType) {
 
-        return this.mapToOutput(blog)
+        const res = await blogsCollection.insertOne(blog)
+        return res.insertedId.toString();
     },
     async ChangeBlog (id: string, content:InputBlogType) {
 

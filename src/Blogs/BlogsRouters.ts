@@ -8,12 +8,17 @@ import {
 } from "./BlogsMiddlewares";
 import {Router} from "express";
 import {authMiddleware} from "../Auth/BasicAuth";
+import {postsController} from "../Posts/PostsController";
 
 export const blogRouter = Router();
 
 blogRouter.get('/', blogsController.getBlogs)
 
 blogRouter.get('/:id',ObjectIdValidationMiddleware, blogsController.getBlogByID)
+
+blogRouter.get('/id/posts', blogsController.getPostsForBlog)
+
+blogRouter.post('/id/posts',authMiddleware, postsController.createPost)
 
 blogRouter.post('/',authMiddleware, BlogNameValidation, BlogDescriptionValidation, BlogUrlLengthValidation, BlogUrlValidation, ErrorCollectionMiddleware, blogsController.createBlog)
 
