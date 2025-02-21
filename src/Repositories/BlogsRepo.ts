@@ -6,13 +6,8 @@ import {BlogOutputType} from "../IO Types/BlogOutputType";
 
 export const BlogsRepo = {
     async ShowAllBlogs () {
-        const allblogs = await blogsCollection.find().toArray();
-        return allblogs.map(el=> ({
-            id:el._id, name: el.name,
-            description : el.description,
-            websiteUrl : el.websiteUrl,
-            createdAt : el.createdAt,
-            isMembership : el.isMembership}))
+        const AllBlogs = await blogsCollection.find().toArray();
+        return AllBlogs.map(el=> (this.mapToOutput(el)))
     },
     async ShowBlogByID (id:string) {
         const _id = new ObjectId(id)
@@ -49,13 +44,8 @@ export const BlogsRepo = {
     },
 
     mapToOutput(blog: BlogDBType): BlogOutputType {
-        return {
-            id : (blog._id).toString(),
-            name: blog.name,
-            description : blog.description,
-            websiteUrl : blog.websiteUrl,
-            createdAt : blog.createdAt,
-            isMembership : blog.isMembership,
-        }
+        let MappedBlog:any = {id : (blog._id).toString(), ...blog}
+        delete MappedBlog._id
+        return MappedBlog as BlogOutputType
         }
 }
