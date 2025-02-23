@@ -2,8 +2,8 @@ import express, {Request, Response} from 'express'
 import cors from 'cors'
 import {db} from "./db/db";
 import {SETTINGS} from "./settings";
-import {blogRouter} from "./Blogs/BlogsRouters";
-import {postRouter} from "./Posts/PostsRouters";
+import {blogRouter} from "./Modules/Blogs/BlogsRouters";
+import {postRouter} from "./Modules/Posts/PostsRouters";
 import {blogsCollection, postsCollection} from "./db/mongoDB";
 
 export const app = express()

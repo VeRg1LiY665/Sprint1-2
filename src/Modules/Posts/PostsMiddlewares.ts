@@ -1,6 +1,6 @@
-import {body, validationResult} from "express-validator";
+import {body, query, validationResult} from "express-validator";
 import {Request,Response, NextFunction} from "express";
-import {blogsCollection} from "../db/mongoDB";
+import {blogsCollection} from "../../db/mongoDB";
 import mongoose from "mongoose";
 import {ObjectId} from "mongodb";
 
@@ -22,6 +22,19 @@ export const BlogIdValidation = body('blogId').custom(async (value:string) => {
 
 }).withMessage({message: 'Incorrect Blog ID',field: 'blogId'})
 
+export const PostQueryPageNumberValidation =query('pageNumber').isInt().withMessage(
+    {message: 'Not a valid pageNumber',field: 'pageNumber'})
+
+export const PostQueryPageSizeValidation =query('pageSize').isInt().withMessage(
+    {message: 'Not a valid pageSize',field: 'pageSize'})
+
+export const PostQuerySortByValidation =query('pageSize').isString().withMessage(
+    {message: 'Not a valid sortBy',field: 'sortBy'})
+
+export const PostQuerySortDirectionValidation =query('sortDirection').custom((value:string) =>{
+    if (value !== 'ascending' || 'descending' || 'asc' || 'desc' || 1 || -1) {throw new Error()}
+}).withMessage(
+    {message: 'Not a valid sortDirection',field: 'sortDirection'})
 
 export const InputValidationMiddleware = (req:Request, res: Response, next:NextFunction) => {
     const result = validationResult(req).formatWith(({msg}) => msg).array({ onlyFirstError: true });

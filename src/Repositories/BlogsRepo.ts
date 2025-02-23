@@ -2,7 +2,6 @@ import {InputBlogType} from "../IO Types/InputBlogType";
 import {blogsCollection, postsCollection} from "../db/mongoDB";
 import {ObjectId} from "mongodb";
 import {BlogDBType} from "../Data Types/BlogDBType";
-import {BlogOutputType} from "../IO Types/BlogOutputType";
 
 export const BlogsRepo = {
 
@@ -21,16 +20,13 @@ export const BlogsRepo = {
             {_id: new ObjectId(id)},
             {$set:{...content}}
         )
-        await postsCollection.updateMany(
+        try {await postsCollection.updateMany(
             {blogId:id},
             {$set:{blogName:content.name}}
-        )
+        )}
+        catch (e) {
+            console.error(e);
+        }
             return res.matchedCount === 1;
     },
-
-    mapToOutput(blog: BlogDBType): BlogOutputType {
-        let MappedBlog:any = {id : (blog._id).toString(), ...blog}
-        delete MappedBlog._id
-        return MappedBlog as BlogOutputType
-        }
 }

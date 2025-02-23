@@ -13,20 +13,17 @@ export const PostsRepo = {
         const res = await postsCollection.deleteOne({_id : new ObjectId(id)})
         return res.deletedCount === 1;
     },
-    async SetUpNewPost(content:InputPostType) {
-        const foundBlog = await BlogsQRepo.ShowBlogByID(content.blogId)
-        const post = {
-            ...content,
-            _id: new ObjectId(),
-            blogName: foundBlog!.name,
-            createdAt: new Date().toISOString(),
-        }
 
-        await postsCollection.insertOne(post)
-        return this.mapToOutput(post)
+    async SetUpNewPost(content:PostDBType) {
+        try {await postsCollection.insertOne(content)}
+        catch (e) {
+            console.error(e);
+            return false;
+        }
+        return true
     },
 
-    async SetUpNewPostForBlog(content:InputPostType){
+    async SetUpNewPostForBlog(blogId:string, content:InputPostType){
         const foundBlog = await BlogsQRepo.ShowBlogByID(content.blogId)
         const post = {
             ...content,
@@ -45,7 +42,8 @@ export const PostsRepo = {
             {_id:new ObjectId(id)},
             {$set:{...content}}
         )
-if (res.matchedCount === 1) {
+        return res.matchedCount===1
+/*if (res.matchedCount === 1) {
     const foundBlog = await BlogsQRepo.ShowBlogByID(content.blogId)
     const origPost = await PostsQRepo.ShowPostByID(id)
 
@@ -59,18 +57,12 @@ if (res.matchedCount === 1) {
     )
     return true;}
 
-else {return false}
+else {return false}*/
     },
 
     mapToOutput(post: PostDBType): PostOutputType {
-        return {
-            id : (post._id).toString(),
-            title: post.title,
-            shortDescription : post.shortDescription,
-            content : post.content,
-            blogId : post.blogId,
-            blogName : post.blogName,
-            createdAt: post.createdAt,
-        }
+        let MappedPost:any = {id : (post._id).toString(), ...post}
+        delete MappedPost._id
+        return MappedPost as PostOutputType
     }
 }

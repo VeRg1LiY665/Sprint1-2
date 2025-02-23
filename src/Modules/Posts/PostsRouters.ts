@@ -1,18 +1,23 @@
 import {postsController} from "./PostsController";
 import {
-    BlogIdValidation, BlogIdValidationMiddleware,
+    BlogIdValidation,
+    BlogIdValidationMiddleware,
     InputValidationMiddleware,
     PostContentValidation,
+    PostQueryPageNumberValidation,
+    PostQueryPageSizeValidation,
+    PostQuerySortByValidation,
+    PostQuerySortDirectionValidation,
     PostShortDescriptionValidation,
     PostTitleValidation
 } from "./PostsMiddlewares";
 
 import {Router} from "express";
-import {authMiddleware} from "../Auth/BasicAuth";
+import {authMiddleware} from "../../Auth/BasicAuth";
 import {ObjectIdValidationMiddleware} from "../Blogs/BlogsMiddlewares";
 export const postRouter = Router();
 
-postRouter.get('/', postsController.getPosts)
+postRouter.get('/', PostQueryPageNumberValidation, PostQueryPageSizeValidation, PostQuerySortByValidation, PostQuerySortDirectionValidation, postsController.getPosts)
 
 postRouter.get('/:id', ObjectIdValidationMiddleware, postsController.getPostByID)
 
