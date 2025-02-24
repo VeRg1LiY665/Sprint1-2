@@ -14,6 +14,12 @@ import {
 import {Router} from "express";
 import {authMiddleware} from "../../Auth/BasicAuth";
 import {postsController} from "../Posts/PostsController";
+import {
+    InputValidationMiddleware,
+    PostContentValidation,
+    PostShortDescriptionValidation,
+    PostTitleValidation
+} from "../Posts/PostsMiddlewares";
 
 export const blogRouter = Router();
 
@@ -21,9 +27,9 @@ blogRouter.get('/', BlogQueryPageNumberValidation, BlogQueryPageSizeValidation, 
 
 blogRouter.get('/:id',ObjectIdValidationMiddleware, blogsController.getBlogByID)
 
-blogRouter.get('/:id/posts', ObjectIdValidationMiddleware, BlogQueryPageNumberValidation, BlogQueryPageSizeValidation, BlogQuerySortByValidation, BlogQuerySortDirectionValidation, blogsController.getPostsForBlog)
+blogRouter.get('/:id/posts', ObjectIdValidationMiddleware, BlogQueryPageNumberValidation, BlogQueryPageSizeValidation, BlogQuerySortByValidation, BlogQuerySortDirectionValidation, postsController.getPostsForBlog)
 
-blogRouter.post('/:id/posts',authMiddleware, ObjectIdValidationMiddleware, postsController.createPostForBlog)
+blogRouter.post('/:id/posts',authMiddleware, ObjectIdValidationMiddleware,PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, InputValidationMiddleware, postsController.createPostForBlog)
 
 blogRouter.post('/',authMiddleware, BlogNameValidation, BlogDescriptionValidation, BlogUrlLengthValidation, BlogUrlValidation, ErrorCollectionMiddleware, blogsController.createBlog)
 

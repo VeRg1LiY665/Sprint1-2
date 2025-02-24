@@ -3,13 +3,16 @@ import {PostsRepo} from "../../Repositories/PostsRepo";
 import {PostsQRepo} from "../../Repositories/PostsQRepo";
 import {PostsServices} from "../../Services/PostsServices";
 import {paginationQueries} from "../../helpers/pagination-values";
+import {BlogsQRepo} from "../../Repositories/BlogsQRepo";
+import {BlogOutputType} from "../../IO Types/BlogOutputType";
 
 
 export const postsController= {
     getPosts: async (req: Request, res: Response) => {
         const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm} = paginationQueries(req)
         const posts = await PostsQRepo.ShowAllPosts({pageNumber, pageSize, sortBy, sortDirection, searchNameTerm})
-        const result = PostsQRepo.PaginationMap({pageNumber, pageSize, posts})
+        const postsCount = await BlogsQRepo.BlogsCounter(searchNameTerm)
+        const result = PostsQRepo.PaginationMap({pageNumber, pageSize, postsCount, posts})
         res.status(200).json(result)
     },
 
@@ -19,9 +22,22 @@ export const postsController= {
             res.status(404).json('Error: post not found')
             return
         }
-
         res.status(200).json(result)
     },
+
+    getPostsForBlog: async (req: Request, res: Response) => {
+        const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm} = paginationQueries(req)
+        const FoundBlog = await BlogsQRepo.ShowBlogByID(req.params.id);
+
+        if (FoundBlog===null) {res.status(404).json('Error: blog not found')}
+        else {const posts = await PostsQRepo.ShowPostsForBlog({pageNumber, pageSize, sortBy, sortDirection, searchNameTerm, blogId:FoundBlog.id})
+
+            if (posts===null) {res.status(404).json('Posts for given blog not found')}
+              else{
+                const postsCount = await PostsQRepo.PostsCounter(searchNameTerm,FoundBlog.id)
+                res.status(200).json(PostsQRepo.PaginationMap({pageNumber, pageSize,postsCount, posts}))}
+        }
+        },
 
     deletePost: async (req: Request, res: Response) => {
         (await PostsRepo.DeletePost(req.params.id)) ? res.sendStatus(204) : res.status(404).json('Error: post not found')
@@ -29,7 +45,6 @@ export const postsController= {
 
     createPost: async (req: Request, res: Response) => {
         const CreatedId = await PostsServices.SetUpNewPost(req.body);
-
         if(!CreatedId){ res.status(400).json('Error: no post created')}
         else {
             const result = await PostsQRepo.ShowPostByID(CreatedId);
@@ -38,13 +53,15 @@ export const postsController= {
     },
 
     createPostForBlog: async (req: Request, res: Response) => {
-        console.log(req.params.id)
-        const CreatedId = await PostsServices.SetUpNewPostForBlog(req.params.id, req.body);
+        const foundBlog:BlogOutputType|null = await BlogsQRepo.ShowBlogByID(req.params.id)
+        if (!foundBlog) {res.status(404).json('Error: blog not found')}
+        else{
+        const CreatedId = await PostsServices.SetUpNewPostForBlog(req.body, foundBlog);
         if(!CreatedId){ res.status(400).json('Error: no post created')}
         else {
             const result = await PostsQRepo.ShowPostByID(CreatedId);
             (!result) ? res.status(404).json('Error: post not found') : res.status(201).json(result)
-        }
+        }}
     },
 
     updatePost: async (req: Request, res: Response) => {

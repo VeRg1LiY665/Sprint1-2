@@ -12,9 +12,9 @@ export const BlogsQRepo = {
         searchNameTerm: string | null
     }):Promise<BlogOutputType[]> {
 
-        const filter:any={};
+        let filter:any={};
 
-        if(dto.searchNameTerm) {filter.title = {$regex:dto.searchNameTerm, $options: 'i'}}
+        if(dto.searchNameTerm) {filter = {regex:dto.searchNameTerm, options: 'i'}}
 
         const AllBlogs = await blogsCollection
             .find(filter)
@@ -35,22 +35,29 @@ export const BlogsQRepo = {
         return this.mapToOutput(blog)
     },
 
+    async BlogsCounter(searchNameTerm:string|null):Promise<number>{
+        let filter:any={};
+        if(searchNameTerm) {filter = {$regex:searchNameTerm, $options: 'i'}}
+        return await blogsCollection.countDocuments(filter)
+    },
+
     mapToOutput(blog: BlogDBType): BlogOutputType {
         let MappedBlog:any = {id : (blog._id).toString(), ...blog}
         delete MappedBlog._id
         return MappedBlog as BlogOutputType
     },
 
-    PaginationMap(dto:{
+    async PaginationMap(dto:{
         pageNumber:number,
         pageSize:number,
+        blogsCount:number,
         blogs: BlogOutputType[]
     } ) {
 return {
-    pagesCount: Math.ceil(dto.blogs.length / dto.pageSize),
+    pagesCount: Math.ceil(dto.blogsCount / dto.pageSize),
     page: dto.pageNumber,
     pageSize: dto.pageSize,
-    totalCount: dto.blogs.length,
+    totalCount: dto.blogsCount,
     items: dto.blogs
 }
 

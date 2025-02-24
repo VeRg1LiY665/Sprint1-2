@@ -23,14 +23,15 @@ export const PostsRepo = {
         return true
     },
 
-    async SetUpNewPostForBlog(blogId:string, content:InputPostType){
-        const foundBlog = await BlogsQRepo.ShowBlogByID(content.blogId)
+    async SetUpNewPostForBlog(blogId:string, content:Partial<InputPostType>){
+        const foundBlog = await BlogsQRepo.ShowBlogByID(blogId)
         const post = {
             ...content,
             _id: new ObjectId(),
             blogName: foundBlog!.name,
+            blogId:blogId,
             createdAt: new Date().toISOString(),
-        }
+        } as PostDBType
 
         await postsCollection.insertOne(post)
         return this.mapToOutput(post)

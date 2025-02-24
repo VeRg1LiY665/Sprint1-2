@@ -19,7 +19,6 @@ export const BlogIdValidation = body('blogId').custom(async (value:string) => {
     const _id = new ObjectId(value)
     const foundBlog = await blogsCollection.findOne({_id : _id})
     if(!foundBlog){throw new Error()}
-
 }).withMessage({message: 'Incorrect Blog ID',field: 'blogId'})
 
 export const PostQueryPageNumberValidation =query('pageNumber').isInt().withMessage(

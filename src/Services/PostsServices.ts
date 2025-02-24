@@ -3,10 +3,11 @@ import {BlogsQRepo} from "../Repositories/BlogsQRepo";
 import {ObjectId} from "mongodb";
 import {PostsRepo} from "../Repositories/PostsRepo";
 import {PostDBType} from "../Data Types/PostDBType";
+import {BlogOutputType} from "../IO Types/BlogOutputType";
 
 export const PostsServices = {
     async SetUpNewPost(content: InputPostType) {
-        const foundBlog = await BlogsQRepo.ShowBlogByID(content.blogId)
+        const foundBlog:BlogOutputType|null = await BlogsQRepo.ShowBlogByID(content.blogId)
 
         const post = {
             ...content,
@@ -23,15 +24,15 @@ export const PostsServices = {
         return post._id.toString()
     },
 
-    async SetUpNewPostForBlog(blogID:string, content: Partial<InputPostType>) {
-        const foundBlog = await BlogsQRepo.ShowBlogByID(blogID)
+    async SetUpNewPostForBlog(content: Partial<InputPostType>, foundBlog:BlogOutputType) {
 
-        const post = {
-            ...content,
-            _id: new ObjectId(),
-            blogName: foundBlog!.name,
-            createdAt: new Date().toISOString(),
-        } as PostDBType
+    const post = {
+        ...content,
+        _id: new ObjectId(),
+        blogName: foundBlog!.name,
+        blogId: foundBlog!.id,
+        createdAt: new Date().toISOString(),
+    } as PostDBType
 
         try {await PostsRepo.SetUpNewPost(post)}
         catch (e) {
@@ -39,6 +40,7 @@ export const PostsServices = {
             return null}
 
         return post._id.toString()
+
     }
 
 }
