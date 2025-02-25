@@ -15,7 +15,6 @@ export const BlogsQRepo = {
         let filter:any={};
 
         if(dto.searchNameTerm) {filter.name = {$regex:dto.searchNameTerm, $options: 'i'}}
-console.log(filter);
         const AllBlogs = await blogsCollection
             .find(filter)
             .sort(dto.sortBy, dto.sortDirection===1 ? 1 :-1)
