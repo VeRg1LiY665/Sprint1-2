@@ -14,8 +14,8 @@ export const BlogsQRepo = {
 
         let filter:any={};
 
-        if(dto.searchNameTerm) {filter = {regex:dto.searchNameTerm, options: 'i'}}
-
+        if(dto.searchNameTerm) {filter.name = {$regex:dto.searchNameTerm, $options: 'i'}}
+console.log(filter);
         const AllBlogs = await blogsCollection
             .find(filter)
             .sort(dto.sortBy, dto.sortDirection===1 ? 1 :-1)
@@ -37,7 +37,7 @@ export const BlogsQRepo = {
 
     async BlogsCounter(searchNameTerm:string|null):Promise<number>{
         let filter:any={};
-        if(searchNameTerm) {filter = {$regex:searchNameTerm, $options: 'i'}}
+        if(searchNameTerm!==null) {filter.name = {$regex:searchNameTerm, $options: 'i'}}
         return await blogsCollection.countDocuments(filter)
     },
 
