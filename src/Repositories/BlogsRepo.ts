@@ -9,6 +9,7 @@ export const BlogsRepo = {
         const res = await blogsCollection.deleteOne({_id : new ObjectId(id)})
         return res.deletedCount === 1;
     },
+
     async SetUpNewBlog(blog:BlogDBType) {
 
         const res = await blogsCollection.insertOne(blog)
@@ -20,13 +21,11 @@ export const BlogsRepo = {
             {_id: new ObjectId(id)},
             {$set:{...content}}
         )
-        try {await postsCollection.updateMany(
+        await postsCollection.updateMany(
             {blogId:id},
             {$set:{blogName:content.name}}
-        )}
-        catch (e) {
-            console.error(e);
-        }
+        )
+
             return res.matchedCount === 1;
     },
 }

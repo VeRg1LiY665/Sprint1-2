@@ -21,22 +21,23 @@ export const BlogIdValidation = body('blogId').custom(async (value:string) => {
     if(!foundBlog){throw new Error()}
 }).withMessage({message: 'Incorrect Blog ID',field: 'blogId'})
 
-export const PostQueryPageNumberValidation =query('pageNumber').isInt().withMessage(
+export const PostQueryPageNumberValidation =query('pageNumber').optional().isInt().withMessage(
     {message: 'Not a valid pageNumber',field: 'pageNumber'})
 
-export const PostQueryPageSizeValidation =query('pageSize').isInt().withMessage(
+export const PostQueryPageSizeValidation =query('pageSize').optional().isInt().withMessage(
     {message: 'Not a valid pageSize',field: 'pageSize'})
 
-export const PostQuerySortByValidation =query('pageSize').isString().withMessage(
+export const PostQuerySortByValidation =query('pageSize').optional().isString().withMessage(
     {message: 'Not a valid sortBy',field: 'sortBy'})
 
-export const PostQuerySortDirectionValidation =query('sortDirection').custom((value:string) =>{
+export const PostQuerySortDirectionValidation =query('sortDirection').optional().custom((value:string) =>{
     if (value !== 'ascending' || 'descending' || 'asc' || 'desc' || 1 || -1) {throw new Error()}
 }).withMessage(
     {message: 'Not a valid sortDirection',field: 'sortDirection'})
 
 export const InputValidationMiddleware = (req:Request, res: Response, next:NextFunction) => {
     const result = validationResult(req).formatWith(({msg}) => msg).array({ onlyFirstError: true });
+
     if (result.length>0) {
         res.status(400).json({ errorsMessages: result });
         return;
@@ -47,7 +48,7 @@ export const BlogIdValidationMiddleware = async (req:Request, res: Response, nex
     if (!mongoose.isValidObjectId(req.body.blogId))
     {    if (!await blogsCollection.findOne({_id : new ObjectId(req.body.blogId)}))
     {res.status(400).json('BlodId is incorrect');return}
-        next()
+      else  {next()}
     }
-    else next()
+    else {next()}
 }

@@ -41,6 +41,14 @@ export const PostsServices = {
 
         return post._id.toString()
 
+    },
+
+    async DeletePost(id:string){
+        return await PostsRepo.DeletePost(id)
+    },
+
+    async UpdatePost(id: string, content:InputPostType){
+        return await PostsRepo.ChangePost(id, content)
     }
 
 }

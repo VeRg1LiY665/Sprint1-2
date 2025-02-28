@@ -1,8 +1,6 @@
 import {InputBlogType} from "../IO Types/InputBlogType";
 import {ObjectId} from "mongodb";
-import {blogsCollection, postsCollection} from "../db/mongoDB";
 import {BlogsRepo} from "../Repositories/BlogsRepo";
-import {PostsRepo} from "../Repositories/PostsRepo";
 
 export const BlogsServices = {
     async SetUpNewBlog(content:InputBlogType){
@@ -16,6 +14,14 @@ export const BlogsServices = {
 
     },
 
+async UpdateBlog (id:string, content:InputBlogType){
+        return await BlogsRepo.ChangeBlog(id, content)
 
+},
+
+    async DeleteBlog (id:string){
+        return await BlogsRepo.DeleteBlog(id)
+
+    }
 
 }

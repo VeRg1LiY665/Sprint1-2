@@ -23,16 +23,59 @@ import {
 
 export const blogRouter = Router();
 
-blogRouter.get('/', BlogQueryPageNumberValidation, BlogQueryPageSizeValidation, BlogQuerySortByValidation, BlogQuerySortDirectionValidation, blogsController.getBlogs)
+blogRouter.get('/',
+    BlogQueryPageNumberValidation,
+    BlogQueryPageSizeValidation,
+    BlogQuerySortByValidation,
+    BlogQuerySortDirectionValidation,
 
-blogRouter.get('/:id',ObjectIdValidationMiddleware, blogsController.getBlogByID)
+    blogsController.getBlogs)
 
-blogRouter.get('/:id/posts', ObjectIdValidationMiddleware, BlogQueryPageNumberValidation, BlogQueryPageSizeValidation, BlogQuerySortByValidation, BlogQuerySortDirectionValidation, postsController.getPostsForBlog)
+blogRouter.get('/:id',
+    ObjectIdValidationMiddleware,
+    ErrorCollectionMiddleware,
+    blogsController.getBlogByID)
 
-blogRouter.post('/:id/posts',authMiddleware, ObjectIdValidationMiddleware,PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, InputValidationMiddleware, postsController.createPostForBlog)
+blogRouter.get('/:id/posts',
+    ObjectIdValidationMiddleware,
+    BlogQueryPageNumberValidation,
+    BlogQueryPageSizeValidation,
+    BlogQuerySortByValidation,
+    BlogQuerySortDirectionValidation,
 
-blogRouter.post('/',authMiddleware, BlogNameValidation, BlogDescriptionValidation, BlogUrlLengthValidation, BlogUrlValidation, ErrorCollectionMiddleware, blogsController.createBlog)
+    postsController.getPostsForBlog)
 
-blogRouter.delete('/:id',authMiddleware, ObjectIdValidationMiddleware, ObjectIdValidationMiddleware, blogsController.deleteBlog)
+blogRouter.post('/:id/posts',
+    authMiddleware,
+    ObjectIdValidationMiddleware,
+    PostTitleValidation,
+    PostShortDescriptionValidation,
+    PostContentValidation,
+    InputValidationMiddleware,
+    postsController.createPostForBlog)
 
-blogRouter.put('/:id',authMiddleware, BlogNameValidation, BlogDescriptionValidation, BlogUrlLengthValidation, BlogUrlValidation, ErrorCollectionMiddleware, ObjectIdValidationMiddleware, blogsController.updateBlog)
+blogRouter.post('/',
+    authMiddleware,
+    BlogNameValidation,
+    BlogDescriptionValidation,
+    BlogUrlLengthValidation,
+    BlogUrlValidation,
+    ErrorCollectionMiddleware,
+    blogsController.createBlog)
+
+blogRouter.delete('/:id',
+    authMiddleware,
+    ObjectIdValidationMiddleware,
+    ObjectIdValidationMiddleware,
+    ErrorCollectionMiddleware,
+    blogsController.deleteBlog)
+
+blogRouter.put('/:id',
+    authMiddleware,
+    BlogNameValidation,
+    BlogDescriptionValidation,
+    BlogUrlLengthValidation,
+    BlogUrlValidation,
+    ErrorCollectionMiddleware,
+    ObjectIdValidationMiddleware,
+    blogsController.updateBlog)

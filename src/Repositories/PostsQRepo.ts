@@ -1,9 +1,7 @@
-import {blogsCollection, postsCollection} from "../db/mongoDB";
+import {postsCollection} from "../db/mongoDB";
 import {ObjectId} from "mongodb";
 import {PostDBType} from "../Data Types/PostDBType";
 import {PostOutputType} from "../IO Types/PostOutputType";
-import {BlogOutputType} from "../IO Types/BlogOutputType";
-import {BlogDBType} from "../Data Types/BlogDBType";
 
 export const PostsQRepo = {
     async ShowAllPosts(dto:{

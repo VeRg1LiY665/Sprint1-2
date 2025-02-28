@@ -46,7 +46,7 @@ export const BlogsQRepo = {
         return MappedBlog as BlogOutputType
     },
 
-    async PaginationMap(dto:{
+    PaginationMap(dto:{
         pageNumber:number,
         pageSize:number,
         blogsCount:number,

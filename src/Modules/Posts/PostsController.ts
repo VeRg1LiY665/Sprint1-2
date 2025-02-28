@@ -1,5 +1,4 @@
 import {Request, Response} from 'express'
-import {PostsRepo} from "../../Repositories/PostsRepo";
 import {PostsQRepo} from "../../Repositories/PostsQRepo";
 import {PostsServices} from "../../Services/PostsServices";
 import {paginationQueries} from "../../helpers/pagination-values";
@@ -18,11 +17,10 @@ export const postsController= {
 
     getPostByID: async (req: Request, res: Response) => {
         const result = await PostsQRepo.ShowPostByID(req.params.id)
-        if (!result) {
+        if (result===null) {
             res.status(404).json('Error: post not found')
-            return
         }
-        res.status(200).json(result)
+        else {res.status(200).json(result)}
     },
 
     getPostsForBlog: async (req: Request, res: Response) => {
@@ -40,7 +38,7 @@ export const postsController= {
         },
 
     deletePost: async (req: Request, res: Response) => {
-        (await PostsRepo.DeletePost(req.params.id)) ? res.sendStatus(204) : res.status(404).json('Error: post not found')
+        (await PostsServices.DeletePost(req.params.id)) ? res.sendStatus(204) : res.status(404).json('Error: post not found')
     },
 
     createPost: async (req: Request, res: Response) => {
@@ -65,7 +63,7 @@ export const postsController= {
     },
 
     updatePost: async (req: Request, res: Response) => {
-        const AlterFlag = await PostsRepo.ChangePost(req.params.id, req.body);
+        const AlterFlag = await PostsServices.UpdatePost(req.params.id, req.body);
         (AlterFlag) ? res.status(204).json('Successful update'): res.status(404).json('Error: post not found');
     }
 }
