@@ -4,24 +4,31 @@ import {UsersRepo} from "../Repositories/UsersRepo";
 import {UserDBType} from "../Data Types/UserDBType";
 import {hash} from "bcrypt";
 
-export let errorsMessages={}
 
 export const UsersServices ={
     async CreateUser(content: InputUserType) {
-try {
+    let CreateResult = {}
+        try {
     if (await UsersRepo.ShowUser(content.email) !== null) {
         throw {field: 'email', message: 'email should be unique'}
     }}
-catch(error){
-        errorsMessages = error;
+    catch(error){
+        return CreateResult =  {
+            ['id']: null,
+            ['errorsMessages']: [error]
+        }
     }
     try {
         if (await UsersRepo.ShowUser(content.login) !== null) {
             throw {field: 'login', message: 'login should be unique'}
         }
     }
-        catch(error){ return error;}
-
+        catch(error){
+            return CreateResult =  {
+                ['id']: null,
+                ['errorsMessages']: [error]
+            }
+    }
 
         const passHash = await hash(content.password, 10)
         const user ={
@@ -32,7 +39,10 @@ catch(error){
             createdAt: new Date().toISOString()
         } as UserDBType
 
-        return await UsersRepo.SetUpNewUser(user)
+        return CreateResult =  {
+            ['id']: await UsersRepo.SetUpNewUser(user),
+            ['errorsMessages']: null
+        }
     },
 
     async DeleteUser(id: string): Promise<boolean> {

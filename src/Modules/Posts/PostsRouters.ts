@@ -17,7 +17,7 @@ import {authMiddleware} from "../../Auth/BasicAuth";
 import {ObjectIdValidationMiddleware} from "../Blogs/BlogsMiddlewares";
 export const postRouter = Router();
 
-postRouter.get('/', PostQueryPageNumberValidation, PostQueryPageSizeValidation, PostQuerySortByValidation, PostQuerySortDirectionValidation, postsController.getPosts)
+postRouter.get('/', PostQueryPageNumberValidation, PostQueryPageSizeValidation, PostQuerySortByValidation, PostQuerySortDirectionValidation,InputValidationMiddleware, postsController.getPosts)
 
 postRouter.get('/:id', ObjectIdValidationMiddleware, postsController.getPostByID)
 

@@ -14,9 +14,12 @@ export const usersController= {
     },
 
     createUser: async (req: Request, res: Response) => {
-        const id = await UsersServices.CreateUser(req.body)
-        const result = await UsersQRepo.ShowUserByID(id);
-        (result) ? res.status(201).json(result) : res.status(400).json('Error: user was not created');
+        const CreateResult = await UsersServices.CreateUser(req.body)
+        if  (CreateResult.id ===null){
+            res.status(400).json({errorsMessages:CreateResult.errorsMessages})
+        }
+        else {const result = await UsersQRepo.ShowUserByID(CreateResult.id);
+        (result!==null) ? res.status(201).json(result) : res.status(400).json('Error: user was not created');}
     },
 
     deleteUser: async (req: Request, res: Response) => {

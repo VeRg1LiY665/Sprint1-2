@@ -14,17 +14,17 @@ export const UsersQRepo = {
         searchLoginTerm: string | null,
         searchEmailTerm: string | null
     }): Promise<UserOutputType[]> {
-        let filter: any = {};
-
-        if (dto.searchLoginTerm) {
-            filter.name = {$regex: dto.searchLoginTerm, $options: 'i'}
+       //let filter: any = {};
+let $or = []
+        if (dto.searchLoginTerm!==null) {
+            $or.push({login: {$regex: dto.searchLoginTerm, $options: 'i'}})
         }
-        if (dto.searchEmailTerm) {
-            filter.name = {$regex: dto.searchEmailTerm, $options: 'i'}
+        if (dto.searchEmailTerm!==null) {
+            $or.push({email: {$regex: dto.searchEmailTerm, $options: 'i'}})
         }
 
         const AllUsers = await usersCollection
-            .find(filter)
+            .find(($or.length>0) ? {$or:$or} : {})
             .sort(dto.sortBy, dto.sortDirection === 1 ? 1 : -1)
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
@@ -42,21 +42,20 @@ export const UsersQRepo = {
     },
 
     async UsersCounter(searchLoginTerm: string | null, searchEmailTerm: string | null): Promise<number> {
-        let filter: any = {};
+        let $or = [];
         if (searchLoginTerm) {
-            filter.login = {$regex: searchLoginTerm, $options: 'i'}
+            $or.push({login: {$regex: searchLoginTerm, $options: 'i'}})
         }
         if (searchEmailTerm) {
-            filter.email = {$regex: searchEmailTerm, $options: 'i'}
+            $or.push({email: {$regex: searchEmailTerm, $options: 'i'}})
         }
-        return await usersCollection.countDocuments(filter)
+        return await usersCollection.countDocuments(($or.length>0) ? {$or:$or} : {})
     },
 
     mapToOutput(user: UserDBType): UserOutputType {
         let MappedUser: any = {id: (user._id).toString(), ...user}
         delete MappedUser._id
         delete MappedUser.passwordHash
-        delete MappedUser.salt
         return MappedUser as UserOutputType
     },
 

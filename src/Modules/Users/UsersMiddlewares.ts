@@ -21,7 +21,10 @@ export const UserQueryPageSizeValidation =query('pageSize').optional().isInt().w
 export const UserQuerySortByValidation =query('sortBy').optional().isString().withMessage('Not a valid sortBy')
 
 export const UserQuerySortDirectionValidation =query('sortDirection').optional().custom((value:string) =>{
-    if (value !== 'ascending' || 'descending' || 'asc' || 'desc' || 1 || -1 ) {throw new Error()}
+    console.log(value !== 'ascending' && value !=='descending' && value !=='asc' && value !=='desc' && value !== '1' && value !=='-1' )
+    if (value !== 'ascending' && value !=='descending' && value !=='asc' && value !=='desc' && value !== '1' && value !=='-1' )
+    {console.log('ошибка'); throw new Error()}
+    return true
 }).withMessage('Not a valid sortDirection')
 
 export const ObjectIdValidationMiddleware = (req:Request, res: Response, next:NextFunction) => {
@@ -38,7 +41,7 @@ const mappedErrors = errors.map(error => {
 }
 return 'Cannot define PATH method'
 })
-    if (errors.length) {
+    if (errors.length>=1) {
         res.status(400).json({errorsMessages:mappedErrors});
         return;
     } else {

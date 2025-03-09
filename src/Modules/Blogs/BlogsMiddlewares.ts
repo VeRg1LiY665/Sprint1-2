@@ -24,7 +24,8 @@ export const BlogQuerySortByValidation =query('sortBy').optional().isString().wi
     {message: 'Not a valid sortBy',field: 'sortBy'})
 
 export const BlogQuerySortDirectionValidation =query('sortDirection').optional().custom((value:string) =>{
-    if (value !== 'ascending' || 'descending' || 'asc' || 'desc' || 1 || -1) {throw new Error()}
+    if (value !== 'ascending' && value !=='descending' && value !=='asc' && value !=='desc' && value !== '1' && value !=='-1' ) {throw new Error()}
+    return true
 }).withMessage(
     {message: 'Not a valid sortDirection',field: 'sortDirection'})
 

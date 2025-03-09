@@ -28,7 +28,7 @@ blogRouter.get('/',
     BlogQueryPageSizeValidation,
     BlogQuerySortByValidation,
     BlogQuerySortDirectionValidation,
-
+    ErrorCollectionMiddleware,
     blogsController.getBlogs)
 
 blogRouter.get('/:id',

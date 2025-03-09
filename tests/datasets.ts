@@ -2,6 +2,7 @@ import {DBType, } from '../src/db/db'
 import {BlogDBType} from "../src/Data Types/BlogDBType";
 import {PostDBType} from "../src/Data Types/PostDBType";
 import {ObjectId} from "mongodb";
+import {UserDBType} from "../src/Data Types/UserDBType";
 
 // готовые данные для переиспользования в тестах
 
@@ -21,5 +22,13 @@ export const datasetpost: PostDBType = {
     content: 'Post content',
     blogId: datasetblog._id.toString(),
     blogName: 'blogname',
+    createdAt: new Date().toISOString(),
+}
+
+export const datasetuser: UserDBType = {
+    _id: new ObjectId(),
+    login: 'string',
+    email: 'string',
+    passwordHash: 'string',
     createdAt: new Date().toISOString(),
 }

@@ -25,9 +25,6 @@ export const UsersRepo = {
     async SetUpNewUser(user: UserDBType): Promise<string> {
         const res = await usersCollection.insertOne(user)
             return res.insertedId.toString();
-
-
-
     },
 
     async DeleteUser(id: string): Promise<boolean> {

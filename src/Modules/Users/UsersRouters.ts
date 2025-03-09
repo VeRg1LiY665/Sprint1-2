@@ -15,13 +15,12 @@ import {authMiddleware} from "../../Auth/BasicAuth";
 export const usersRouter = Router();
 
 usersRouter.get('/',
-    UserQueryPageNumberValidation,
     UserQueryPageSizeValidation,
-    UserQuerySortByValidation,
+    UserQueryPageNumberValidation,
     UserQuerySortDirectionValidation,
+    UserQuerySortByValidation,
     ErrorCollectionMiddleware,
     usersController.getUsers);
-
 
 usersRouter.post('/',
     authMiddleware,
