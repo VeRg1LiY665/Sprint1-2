@@ -8,18 +8,17 @@ import {
     BlogQuerySortDirectionValidation,
     BlogUrlLengthValidation,
     BlogUrlValidation,
-    ErrorCollectionMiddleware,
     ObjectIdValidationMiddleware
 } from "./BlogsMiddlewares";
 import {Router} from "express";
 import {authMiddleware} from "../../Auth/BasicAuth";
 import {postsController} from "../Posts/PostsController";
 import {
-    InputValidationMiddleware,
     PostContentValidation,
     PostShortDescriptionValidation,
     PostTitleValidation
 } from "../Posts/PostsMiddlewares";
+import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
 
 export const blogRouter = Router();
 
@@ -51,7 +50,7 @@ blogRouter.post('/:id/posts',
     PostTitleValidation,
     PostShortDescriptionValidation,
     PostContentValidation,
-    InputValidationMiddleware,
+    ErrorCollectionMiddleware,
     postsController.createPostForBlog)
 
 blogRouter.post('/',

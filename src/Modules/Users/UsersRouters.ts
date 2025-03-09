@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {usersController} from "./UsersController";
 import {
-    ErrorCollectionMiddleware, ObjectIdValidationMiddleware,
+    ObjectIdValidationMiddleware,
     UserEmailValidation,
     UserLoginValidation,
     UserPasswordValidation,
@@ -11,6 +11,7 @@ import {
     UserQuerySortDirectionValidation,
 } from "./UsersMiddlewares";
 import {authMiddleware} from "../../Auth/BasicAuth";
+import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
 
 export const usersRouter = Router();
 

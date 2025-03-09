@@ -2,7 +2,6 @@ import {postsController} from "./PostsController";
 import {
     BlogIdValidation,
     BlogIdValidationMiddleware,
-    InputValidationMiddleware,
     PostContentValidation,
     PostQueryPageNumberValidation,
     PostQueryPageSizeValidation,
@@ -15,14 +14,41 @@ import {
 import {Router} from "express";
 import {authMiddleware} from "../../Auth/BasicAuth";
 import {ObjectIdValidationMiddleware} from "../Blogs/BlogsMiddlewares";
+import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
 export const postRouter = Router();
 
-postRouter.get('/', PostQueryPageNumberValidation, PostQueryPageSizeValidation, PostQuerySortByValidation, PostQuerySortDirectionValidation,InputValidationMiddleware, postsController.getPosts)
+postRouter.get('/',
+    PostQueryPageNumberValidation,
+    PostQueryPageSizeValidation,
+    PostQuerySortByValidation,
+    PostQuerySortDirectionValidation,
+    ErrorCollectionMiddleware,
+    postsController.getPosts)
 
-postRouter.get('/:id', ObjectIdValidationMiddleware, postsController.getPostByID)
+postRouter.get('/:id',
+    ObjectIdValidationMiddleware,
+    postsController.getPostByID)
 
-postRouter.post('/', authMiddleware, PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, BlogIdValidation, InputValidationMiddleware, postsController.createPost)
+postRouter.post('/',
+    authMiddleware,
+    PostTitleValidation,
+    PostShortDescriptionValidation,
+    PostContentValidation,
+    BlogIdValidation,
+    ErrorCollectionMiddleware,
+    postsController.createPost)
 
-postRouter.delete('/:id', authMiddleware, ObjectIdValidationMiddleware, postsController.deletePost)
+postRouter.delete('/:id',
+    authMiddleware,
+    ObjectIdValidationMiddleware,
+    postsController.deletePost)
 
-postRouter.put('/:id', authMiddleware, PostTitleValidation, PostShortDescriptionValidation, PostContentValidation, BlogIdValidation, InputValidationMiddleware, ObjectIdValidationMiddleware, postsController.updatePost)
+postRouter.put('/:id',
+    authMiddleware,
+    PostTitleValidation,
+    PostShortDescriptionValidation,
+    PostContentValidation,
+    BlogIdValidation,
+    ErrorCollectionMiddleware,
+    ObjectIdValidationMiddleware,
+    postsController.updatePost)

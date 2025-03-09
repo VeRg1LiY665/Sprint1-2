@@ -14,11 +14,14 @@ export const UserPasswordValidation:ValidationChain =body ('password').trim()
 export const UserEmailValidation:ValidationChain =body ('email').trim()
     .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/).withMessage('Not valid email')
 
-export const UserQueryPageNumberValidation =query('pageNumber').optional().isInt().withMessage('Not a valid pageNumber')
+export const UserQueryPageNumberValidation =query('pageNumber').optional().isInt()
+    .withMessage('Not a valid pageNumber')
 
-export const UserQueryPageSizeValidation =query('pageSize').optional().isInt().withMessage('Not a valid pageSize')
+export const UserQueryPageSizeValidation =query('pageSize').optional().isInt()
+    .withMessage('Not a valid pageSize')
 
-export const UserQuerySortByValidation =query('sortBy').optional().isString().withMessage('Not a valid sortBy')
+export const UserQuerySortByValidation =query('sortBy').optional().isString()
+    .withMessage('Not a valid sortBy')
 
 export const UserQuerySortDirectionValidation =query('sortDirection').optional().custom((value:string) =>{
     console.log(value !== 'ascending' && value !=='descending' && value !=='asc' && value !=='desc' && value !== '1' && value !=='-1' )
@@ -32,7 +35,7 @@ export const ObjectIdValidationMiddleware = (req:Request, res: Response, next:Ne
     {res.status(400).json('Not valid ObjectID');return}
     else next()}
 
-export const ErrorCollectionMiddleware = (req:Request, res: Response, next:NextFunction) => {
+/*export const ErrorCollectionMiddleware = (req:Request, res: Response, next:NextFunction) => {
     const errors = validationResult(req).array({onlyFirstError: true})
 const mappedErrors = errors.map(error => {
     if (error.type === 'field') {           //обязательно проверка на field error, только для них существует path
@@ -47,4 +50,4 @@ return 'Cannot define PATH method'
     } else {
         next()
     }
-}
+}*/

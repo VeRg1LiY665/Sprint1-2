@@ -10,3 +10,6 @@ authRouter.post('/login',
     UserPasswordValidation,
     ErrorCollectionMiddleware,
     authController.login)
+
+authRouter.get('/me',
+    authController.info)
