@@ -2,8 +2,17 @@ import {InputPostType} from "../IO Types/InputPostType";
 import {postsCollection} from "../db/mongoDB";
 import {ObjectId} from "mongodb";
 import {PostDBType} from "../Data Types/PostDBType";
+import {NotFoundError} from "../helpers/ErrorHandler";
 
 export const PostsRepo = {
+
+    async ShowPostByID(id:string) {
+        const post = await postsCollection.findOne({_id: new ObjectId(id)})
+        if (!post) {
+            return null;
+        }
+        return (post)
+    },
 
     async DeletePost (id:string) {
         const res = await postsCollection.deleteOne({_id : new ObjectId(id)})

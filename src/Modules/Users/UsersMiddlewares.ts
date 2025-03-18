@@ -24,7 +24,6 @@ export const UserQuerySortByValidation =query('sortBy').optional().isString()
     .withMessage('Not a valid sortBy')
 
 export const UserQuerySortDirectionValidation =query('sortDirection').optional().custom((value:string) =>{
-    console.log(value !== 'ascending' && value !=='descending' && value !=='asc' && value !=='desc' && value !== '1' && value !=='-1' )
     if (value !== 'ascending' && value !=='descending' && value !=='asc' && value !=='desc' && value !== '1' && value !=='-1' )
     {console.log('ошибка'); throw new Error()}
     return true

@@ -1,7 +1,9 @@
-import {Request, Response} from 'express';
+import {Request, Response, NextFunction} from 'express';
 import {BlogsQRepo} from "../../Repositories/BlogsQRepo";
 import {BlogsServices} from "../../Services/BlogsServices";
 import {paginationQueries} from "../../helpers/pagination-values";
+import {CustomError, HttpStatuses, NotFoundError} from "../../helpers/ErrorHandler";
+import {BlogsRepo} from "../../Repositories/BlogsRepo";
 
 export const blogsController= {
     getBlogs: async (req: Request, res: Response) => {
@@ -12,28 +14,56 @@ export const blogsController= {
         res.status(200).json(result)
     },
 
-    getBlogByID: async (req: Request, res: Response) => {
-        const result = await BlogsQRepo.ShowBlogByID(req.params.id)
-        if (result === null) {
-            res.status(404).json( 'Error: blog not found')
-            return
+    getBlogByID: async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            const result = await BlogsQRepo.ShowBlogByID(req.params.id)
+            if (result === null) {
+                throw new NotFoundError('Blog Not Found')
+            }
+            res.status(200).json(result)
         }
-        res.status(200).json(result)
+        catch (err) {next(err)}
     },
 
-    deleteBlog: async (req: Request, res: Response) => {
-       (await BlogsServices.DeleteBlog(req.params.id)) ? res.sendStatus(204) : res.status(404).json('Error: blog not found')
-    },
+    deleteBlog: async (req: Request, res: Response, next:NextFunction) => {
+       try {
+           const foundBlog = await BlogsRepo.ShowBlogByID(req.params.id)
+           if (foundBlog === null) {
+               throw new NotFoundError('Blog Not Found')
+           }
+           (await BlogsServices.DeleteBlog(req.params.id)) ? res.sendStatus(204) : res.status(404).json('Error: blog not found')
+       }
+       catch (err) {next(err)}
+       },
 
-    createBlog: async (req: Request, res: Response) => {
-        const id = await BlogsServices.SetUpNewBlog(req.body)
-        const result = await BlogsQRepo.ShowBlogByID(id);
-        (result) ? res.status(201).json(result) : res.status(400).json('Error: blog was not created');
-    },
-
-    updateBlog: async (req: Request, res: Response) => {
-        const AlterFlag = await BlogsServices.UpdateBlog(req.params.id, req.body);
-       (AlterFlag) ? res.status(204).json('Successful update'): res.status(404).json('Error: blog not found');
+    createBlog: async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            const id = await BlogsServices.SetUpNewBlog(req.body)
+            if (!id) {
+                throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{
+                    field: 'null',
+                    message: 'No update happened in repo'
+                }])
+            }
+            const result = await BlogsQRepo.ShowBlogByID(id);
+            if (!result) {
+                throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{
+                    field: 'null',
+                    message: 'No update happened in repo'
+                }])
+            }
+            res.status(201).json(result)
         }
+        catch (err) {next(err)}
+        },
+
+    updateBlog: async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            const AlterFlag = await BlogsServices.UpdateBlog(req.params.id, req.body);
+            if (!AlterFlag) {throw new NotFoundError('Blog Not Found')}
+            res.status(204).json('Successful update')
+        }
+        catch (err) {next(err)}
+    }
     }
 

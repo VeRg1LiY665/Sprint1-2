@@ -4,6 +4,8 @@ import {ObjectId} from "mongodb";
 import {PostsRepo} from "../Repositories/PostsRepo";
 import {PostDBType} from "../Data Types/PostDBType";
 import {BlogOutputType} from "../IO Types/BlogOutputType";
+import {PostsQRepo} from "../Repositories/PostsQRepo";
+import {NotFoundError} from "../helpers/ErrorHandler";
 
 export const PostsServices = {
     async SetUpNewPost(content: InputPostType) {
@@ -44,10 +46,14 @@ export const PostsServices = {
     },
 
     async DeletePost(id:string){
+        const foundPost = await PostsRepo.ShowPostByID(id)
+        if (foundPost===null) {throw new NotFoundError("Post not Found");}
         return await PostsRepo.DeletePost(id)
     },
 
     async UpdatePost(id: string, content:InputPostType){
+        const foundPost = await PostsRepo.ShowPostByID(id)
+        if (foundPost===null) {throw new NotFoundError("Post not Found");}
         return await PostsRepo.ChangePost(id, content)
     }
 

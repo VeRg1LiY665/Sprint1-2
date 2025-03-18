@@ -27,7 +27,7 @@ export const PostsQRepo = {
 
     async ShowPostByID(id: string) {
         const post = await postsCollection.findOne({_id: new ObjectId(id)})
-        if (!post) {
+        if (post===null) {
             return null
         }
         return this.mapToOutput(post)

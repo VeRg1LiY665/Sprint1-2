@@ -3,11 +3,13 @@ import {PostDBType} from "../Data Types/PostDBType";
 import {BlogDBType} from "../Data Types/BlogDBType";
 import {SETTINGS} from "../settings";
 import {UserDBType} from "../Data Types/UserDBType";
+import {CommentDBType} from "../Data Types/CommentDBType";
 
 
 export let postsCollection: Collection<PostDBType>
 export let blogsCollection: Collection<BlogDBType>
 export let usersCollection: Collection<UserDBType>
+export let commentsCollection: Collection<CommentDBType>
 
 export const db = {
     client: {} as MongoClient,
@@ -42,6 +44,7 @@ export const db = {
             blogsCollection = db.collection<BlogDBType>(SETTINGS.PATH.BLOGS);
             postsCollection = db.collection<PostDBType>(SETTINGS.PATH.POSTS);
             usersCollection = db.collection<UserDBType>(SETTINGS.PATH.USERS);
+            commentsCollection = db.collection<CommentDBType>(SETTINGS.PATH.COMMENTS);
 
             await this.client.connect();
             await this.getDbName().command({ ping: 1 });
@@ -78,6 +81,7 @@ export const db = {
             usersCollection:  this.getDbName().collection('users'),
             blogsCollection:  this.getDbName().collection('blogs'),
             postsCollection:  this.getDbName().collection('posts'),
+            commentsCollection:  this.getDbName().collection('comments'),
         };
     },
 }

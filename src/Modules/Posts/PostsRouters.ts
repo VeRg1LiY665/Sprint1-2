@@ -1,7 +1,5 @@
 import {postsController} from "./PostsController";
 import {
-    BlogIdValidation,
-    BlogIdValidationMiddleware,
     PostContentValidation,
     PostQueryPageNumberValidation,
     PostQueryPageSizeValidation,
@@ -12,9 +10,12 @@ import {
 } from "./PostsMiddlewares";
 
 import {Router} from "express";
-import {authMiddleware} from "../../Auth/BasicAuth";
+import {authMiddleware} from "../../Auth/Middlewares/BasicAuth";
 import {ObjectIdValidationMiddleware} from "../Blogs/BlogsMiddlewares";
 import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
+import {commentsController} from "../Comments/CommentsController";
+import {accessTokenGuard} from "../../Auth/guards/AccesTokenGuard";
+import {CommentContentValidation} from "../Comments/CommentsMiddlewares";
 export const postRouter = Router();
 
 postRouter.get('/',
@@ -29,14 +30,22 @@ postRouter.get('/:id',
     ObjectIdValidationMiddleware,
     postsController.getPostByID)
 
+postRouter.get('/:id/comments',
+    commentsController.getComments)
+
 postRouter.post('/',
     authMiddleware,
     PostTitleValidation,
     PostShortDescriptionValidation,
     PostContentValidation,
-    BlogIdValidation,
     ErrorCollectionMiddleware,
     postsController.createPost)
+
+postRouter.post('/:id/comments',
+    accessTokenGuard,
+    CommentContentValidation,
+    ErrorCollectionMiddleware,
+    commentsController.createComment)
 
 postRouter.delete('/:id',
     authMiddleware,
@@ -48,7 +57,6 @@ postRouter.put('/:id',
     PostTitleValidation,
     PostShortDescriptionValidation,
     PostContentValidation,
-    BlogIdValidation,
     ErrorCollectionMiddleware,
     ObjectIdValidationMiddleware,
     postsController.updatePost)

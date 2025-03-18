@@ -13,11 +13,11 @@ export const PostShortDescriptionValidation =body ('shortDescription').trim().is
 export const PostContentValidation = body ('content').trim().isLength({min:1,max:1000})
     .withMessage('content length should be within 1 to 1000 characters')
 
-export const BlogIdValidation = body('blogId').custom(async (value:string) => {
+/*export const BlogIdValidation = body('blogId').custom(async (value:string) => {
     const _id = new ObjectId(value)
     const foundBlog = await blogsCollection.findOne({_id : _id})
     if(!foundBlog){throw new Error()}
-}).withMessage('Incorrect Blog ID')
+}).withMessage('Incorrect Blog ID')*/
 
 export const PostQueryPageNumberValidation =query('pageNumber').optional().isInt()
     .withMessage('Not a valid pageNumber')

@@ -5,6 +5,15 @@ import {BlogDBType} from "../Data Types/BlogDBType";
 
 export const BlogsRepo = {
 
+    async ShowBlogByID (id:string) {
+        const _id = new ObjectId(id)
+        const blog = await blogsCollection.findOne({_id: _id});
+        if (blog===null) {
+            return null
+        }
+        return (blog)
+    },
+
     async DeleteBlog (id:string) {
         const res = await blogsCollection.deleteOne({_id : new ObjectId(id)})
         return res.deletedCount === 1;

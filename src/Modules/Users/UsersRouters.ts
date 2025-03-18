@@ -10,7 +10,7 @@ import {
     UserQuerySortByValidation,
     UserQuerySortDirectionValidation,
 } from "./UsersMiddlewares";
-import {authMiddleware} from "../../Auth/BasicAuth";
+import {authMiddleware} from "../../Auth/Middlewares/BasicAuth";
 import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
 
 export const usersRouter = Router();

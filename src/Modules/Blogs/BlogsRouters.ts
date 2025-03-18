@@ -11,7 +11,7 @@ import {
     ObjectIdValidationMiddleware
 } from "./BlogsMiddlewares";
 import {Router} from "express";
-import {authMiddleware} from "../../Auth/BasicAuth";
+import {authMiddleware} from "../../Auth/Middlewares/BasicAuth";
 import {postsController} from "../Posts/PostsController";
 import {
     PostContentValidation,
