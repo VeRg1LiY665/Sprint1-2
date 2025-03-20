@@ -56,6 +56,7 @@ let $or = []
         let MappedUser: any = {id: (user._id).toString(), ...user}
         delete MappedUser._id
         delete MappedUser.passwordHash
+        delete MappedUser.emailConfirmation
         return MappedUser as UserOutputType
     },
 

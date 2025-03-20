@@ -5,13 +5,14 @@ type ValidationResultError = {
     [string: string]: [string];
 };
 
-export const UserLoginOrEmailValidation:ValidationChain =body ('login').trim()
+export const UserLoginOrEmailValidation:ValidationChain =body ('loginOrEmail').trim()
     .isString().withMessage('Login or Email is not string')
 
-export const UserPasswordValidation:ValidationChain =body ('password').trim()
-    .isString().withMessage('Password is not string')
+/*export const UserPasswordValidation:ValidationChain =body ('password').trim()
+    .isString().withMessage('Password is not string')*/
 
 
+/*
 export const ErrorCollectionMiddleware = (req:Request, res: Response, next:NextFunction) => {
     const errors = validationResult(req).array({onlyFirstError: true})
     let mappedErrors: ValidationResultError = {}
@@ -27,4 +28,4 @@ export const ErrorCollectionMiddleware = (req:Request, res: Response, next:NextF
     } else {
         next()
     }
-}
+}*/

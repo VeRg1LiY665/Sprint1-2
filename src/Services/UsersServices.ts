@@ -36,7 +36,11 @@ export const UsersServices ={
             email: content.email,
             passwordHash:passHash,
             _id: new ObjectId(),
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            emailConfirmation: {
+                confirmationCode: '',
+                expirationDate: new Date,
+                isConfirmed: true}
         } as UserDBType
 
         return CreateResult =  {

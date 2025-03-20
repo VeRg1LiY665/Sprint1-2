@@ -2,8 +2,33 @@ import {Request, Response, NextFunction} from 'express';
 import {AuthServices} from "./Services/AuthService";
 import {CustomError, HttpStatuses} from "../helpers/ErrorHandler";
 import {UsersQRepo} from "../Repositories/UsersQRepo";
+import {RegServices} from "./Services/RegService";
 
 export const authController = {
+    register: async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        await RegServices.RegisterUser(req.body);
+        res.sendStatus(204)
+    }
+        catch(err){next(err)}
+    },
+
+    confirmEmail: async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        await RegServices.ConfirmEmail(req.body)
+        res.sendStatus(204)
+    }
+        catch(err){next(err)}
+    },
+
+    resendEmail: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await RegServices.ResendEmail(req.body)
+        res.sendStatus(204)
+    }
+    catch(err){next(err)}
+    },
+
     login: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const accessToken = await AuthServices.LoginUser(req.body);

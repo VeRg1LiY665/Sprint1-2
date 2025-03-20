@@ -5,6 +5,15 @@ import mongoose from "mongoose";
 
 export const UsersRepo = {
 
+   /* async UserExistenceCheck(dto: {login: string, email: string }) {
+        let filter = []
+            filter.push({login: {$regex: dto.login, $options: 'i'}})
+            filter.push({email: {$regex: dto.email, $options: 'i'}})
+        const foundUser = await usersCollection
+            .findOne({$or:filter})
+        return (foundUser) ?  true: false
+    },*/
+
     async ShowUser(searchData: string) {
         let filter: any = {};
         switch (true) {
@@ -12,6 +21,8 @@ export const UsersRepo = {
                 break;
             case searchData.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) !== null : filter.email = searchData
                 break;
+            case searchData.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i) !== null : filter.emailConfirmation.confirmationCode = searchData
+                break;  //Здесь возможно работать не будет, если что - сделать отдельный метод, фильтр в нем писать через кавычки ("emailConfirmation.confirmationCode" = searchData)
             default: filter.login = searchData
         }
 
@@ -23,7 +34,7 @@ export const UsersRepo = {
     },
 
     async SetUpNewUser(user: UserDBType): Promise<string> {
-        const res = await usersCollection.insertOne(user)
+       const res = await usersCollection.insertOne(user)
             return res.insertedId.toString();
     },
 
