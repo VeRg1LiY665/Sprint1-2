@@ -14,19 +14,20 @@ export const UsersRepo = {
         return (foundUser) ?  true: false
     },*/
 
-    async ShowUser(searchData: string) {
+    async ShowUser(searchData: string):Promise <UserDBType|null> {
         let filter: any = {};
         switch (true) {
             case  mongoose.isValidObjectId(searchData): filter._id = new ObjectId(searchData)
                 break;
             case searchData.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) !== null : filter.email = searchData
                 break;
-            case searchData.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i) !== null : filter.emailConfirmation.confirmationCode = searchData
-                break;  //Здесь возможно работать не будет, если что - сделать отдельный метод, фильтр в нем писать через кавычки ("emailConfirmation.confirmationCode" = searchData)
+            case searchData.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i) !== null : filter["emailConfirmation.confirmationCode"] = searchData
+                break;  // TODO Здесь точно не работет - сделать отдельный метод, фильтр в нем писать через кавычки ("emailConfirmation.confirmationCode" = searchData)
             default: filter.login = searchData
         }
 
-        const user=  await usersCollection.findOne(filter)
+        const user:UserDBType | null =  await usersCollection.findOne(filter)
+
         if(!user){
             return null
         }
@@ -36,6 +37,14 @@ export const UsersRepo = {
     async SetUpNewUser(user: UserDBType): Promise<string> {
        const res = await usersCollection.insertOne(user)
             return res.insertedId.toString();
+    },
+
+    async UpdateUser(user: UserDBType): Promise<boolean> {
+        const res = await usersCollection.updateOne(
+            {_id: user._id},
+            {$set:{...user}}
+        )
+        return res.matchedCount === 1;
     },
 
     async DeleteUser(id: string): Promise<boolean> {

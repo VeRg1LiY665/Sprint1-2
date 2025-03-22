@@ -47,8 +47,8 @@ export const commentsController= {
        try {
            if (!await CommentsServices.DeleteComment(req.params.id, res.locals.user.userId)) {
                throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{
-                   field: 'null',
-                   message: 'No delete happened in repo'
+                   message: 'No delete happened in repo',
+                   field: 'null'
                }])
            }
            res.status(204).json()
@@ -77,7 +77,7 @@ export const commentsController= {
     updateComment: async (req: Request, res: Response, next:NextFunction) => {
         try {
             const AlterFlag = await CommentsServices.UpdateComment(req.params.id, res.locals.user.userId, req.body);
-            if (!AlterFlag)  {throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{field:'null' , message:'No update happened in repo'}])}
+            if (!AlterFlag)  {throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{message:'No update happened in repo', field:'null'}])}
             res.status(204).json('Successful update')
         }
         catch (err) {next(err)}

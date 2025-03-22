@@ -2,13 +2,13 @@ import {NextFunction, Request, Response} from "express";
 import {Error} from "mongoose";
 
 type ExtensionType = {
-    field: string;
     message: string;
+    field: string;
 };
-const ForbiddenExt: ExtensionType[] = [{field: 'null', message: 'Data to be modified not yours'}];
-const NotFoundExt: ExtensionType[] = [{field: 'null', message: 'Data not found in db'}];
-const DuplicateLoginExt: ExtensionType[] = [{field: 'login', message: 'User with login already exists'}];
-const DuplicateEmailExt: ExtensionType[] = [{field: 'email', message: 'User with email already exists'}];
+const ForbiddenExt: ExtensionType[] = [{message: 'Data to be modified not yours', field: 'null'}];
+const NotFoundExt: ExtensionType[] = [{message: 'Data not found in db', field: 'null'}];
+const DuplicateLoginExt: ExtensionType[] = [{message: 'User with login already exists', field: 'login'}];
+const DuplicateEmailExt: ExtensionType[] = [{message: 'User with email already exists', field: 'email'}];
 
 export enum HttpStatuses {
     Success = 200,
@@ -88,7 +88,13 @@ export class DuplicatedEmailError extends Error{
 }
 
 export const ErrorHandler = async(err:any, req:Request, res: Response, next:NextFunction) => {
-    const resultErrMessage = {errorsMessages: err.extensions}; //здесь привел вывод ошибки к тому что ожидается тестами
-    console.log(resultErrMessage)
-    res.status(err.status).send(resultErrMessage) //пока возвращаю по одной, в перспективе можно копить массив через next, потом возвращать прям массивом ошибки
-}
+
+    if (err.status!==undefined) {
+        const resultErrMessage = {errorsMessages: err.extensions}; //здесь привел вывод ошибки к тому что ожидается тестами
+        console.log(resultErrMessage)
+        res.status(err.status).send(resultErrMessage) //пока возвращаю по одной, в перспективе можно копить массив через next, потом возвращать прям массивом ошибки
+    }
+    else {console.error(err)
+        res.status(500).send(err.message)
+    next()}
+    }

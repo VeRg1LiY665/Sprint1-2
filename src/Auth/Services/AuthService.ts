@@ -9,10 +9,10 @@ export const AuthServices ={
     async LoginUser(content: InputLoginType){
 const foundUser = await UsersRepo.ShowUser(content.loginOrEmail)
 
-if (!foundUser){throw new InvalidCredentialsError('Wrong Credentials', [{field:'loginOrEmail' , message:'Wrong Login or email'}]);}
+if (!foundUser){throw new InvalidCredentialsError('Wrong Credentials', [{message:'Wrong Login or email', field:'loginOrEmail' }]);}
         else {
             if (!(await compare(content.password, foundUser.passwordHash))){
-                throw new InvalidCredentialsError('Wrong Credentials', [{field:'password', message:'Wrong Password'}]);
+                throw new InvalidCredentialsError('Wrong Credentials', [{message:'Wrong Password', field:'password'}]);
             }
         return await jwtService.createToken(foundUser._id.toString());}
     },
@@ -22,7 +22,7 @@ if (!foundUser){throw new InvalidCredentialsError('Wrong Credentials', [{field:'
 
         const result = await jwtService.verifyToken(token);
 
-        if (!result) { throw new InvalidCredentialsError('Wrong Credentials', [{field:'null' , message:'Wrong token'}])
+        if (!result) { throw new InvalidCredentialsError('Wrong Credentials', [{message:'Wrong token', field:'null' }])
         }
         else {return result}
     },

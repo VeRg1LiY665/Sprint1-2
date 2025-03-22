@@ -10,7 +10,7 @@ export const UsersServices ={
     let CreateResult = {}
         try {
     if (await UsersRepo.ShowUser(content.email) !== null) {
-        throw {field: 'email', message: 'email should be unique'}
+        throw {message: 'email should be unique',field: 'email' }
     }}
     catch(error){
         return CreateResult =  {
@@ -20,7 +20,7 @@ export const UsersServices ={
     }
     try {
         if (await UsersRepo.ShowUser(content.login) !== null) {
-            throw {field: 'login', message: 'login should be unique'}
+            throw {message: 'login should be unique',field: 'login' }
         }
     }
         catch(error){

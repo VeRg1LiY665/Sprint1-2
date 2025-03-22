@@ -41,15 +41,15 @@ export const blogsController= {
             const id = await BlogsServices.SetUpNewBlog(req.body)
             if (!id) {
                 throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{
-                    field: 'null',
-                    message: 'No update happened in repo'
+                    message: 'No update happened in repo',
+                    field: 'null'
                 }])
             }
             const result = await BlogsQRepo.ShowBlogByID(id);
             if (!result) {
                 throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{
-                    field: 'null',
-                    message: 'No update happened in repo'
+                    message: 'No update happened in repo',
+                    field: 'null'
                 }])
             }
             res.status(201).json(result)

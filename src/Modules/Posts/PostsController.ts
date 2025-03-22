@@ -62,8 +62,8 @@ export const postsController= {
         try {
             const DeleteFlag = await PostsServices.DeletePost(req.params.id)
             if (!DeleteFlag) {throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{
-                field: 'null',
-                message: 'No delete happened in repo'
+                message: 'No delete happened in repo',
+                field: 'null'
             }])}
             res.sendStatus(204)
         }
@@ -75,8 +75,8 @@ export const postsController= {
             const CreatedId = await PostsServices.SetUpNewPost(req.body);
             if (CreatedId===null) {
                 throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{
-                    field: 'null',
-                    message: 'No update happened in repo'
+                    message: 'No update happened in repo',
+                    field: 'null'
                 }])
             } else {
                 const result = await PostsQRepo.ShowPostByID(CreatedId);
@@ -95,8 +95,8 @@ export const postsController= {
                 const CreatedId = await PostsServices.SetUpNewPostForBlog(req.body, foundBlog);
                 if (!CreatedId) {
                     throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{
-                        field: 'null',
-                        message: 'No update happened in repo'
+                        message: 'No update happened in repo',
+                        field: 'null'
                     }])
                 } else {
                     const result = await PostsQRepo.ShowPostByID(CreatedId);
@@ -112,8 +112,8 @@ export const postsController= {
         try {
             const AlterFlag = await PostsServices.UpdatePost(req.params.id, req.body);
             if (!AlterFlag)  {throw new CustomError('Unexpected exception', HttpStatuses.BadRequest, [{
-                field: 'null',
-                message: 'No update happened in repo'
+                message: 'No update happened in repo',
+                field: 'null'
             }])}
             res.status(204).json('Successful update')
         }

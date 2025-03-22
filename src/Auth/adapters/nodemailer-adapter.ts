@@ -8,7 +8,7 @@ export const nodemailerService = {
         template: (code: string) => string
     ): Promise<boolean> {
         let transporter = nodemailer.createTransport({
-            service: 'gmail',
+            service: 'yandex',
             auth: {
                 user: SETTINGS.EMAIL,
                 pass: SETTINGS.EMAIL_PASS,
@@ -16,7 +16,7 @@ export const nodemailerService = {
         });
 
         let info = await transporter.sendMail({
-            from: '"Blog Platform registration service" <platform@gmail.com>',
+            from: '"Blog Platform registration service" <verg1liy@yandex.ru>',
             to: email,
             subject: 'Your code is here',
             html: template(code), // html body

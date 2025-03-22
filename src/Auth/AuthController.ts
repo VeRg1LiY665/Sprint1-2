@@ -32,7 +32,7 @@ export const authController = {
     login: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const accessToken = await AuthServices.LoginUser(req.body);
-            if (!accessToken) {throw new CustomError("Invalid login token", HttpStatuses.NoContent, [{field:'null', message:'Token = '+accessToken}]);}
+            if (!accessToken) {throw new CustomError("Invalid login token", HttpStatuses.NoContent, [{ message:'Token = '+accessToken, field:'null'}]);}
             res.status(200).json({accessToken:accessToken});
         } catch (err) {
             next(err)
