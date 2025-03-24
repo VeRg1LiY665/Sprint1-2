@@ -29,6 +29,12 @@ authRouter.post('/login',
     ErrorCollectionMiddleware,
     authController.login)
 
+authRouter.post('/refresh-token',
+authController.refreshToken)
+
 authRouter.get('/me',
     accessTokenGuard,
     authController.info)
+
+authRouter.post('/logout',
+    authController.logout)

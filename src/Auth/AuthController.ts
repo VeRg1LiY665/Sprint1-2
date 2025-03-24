@@ -3,6 +3,7 @@ import {AuthServices} from "./Services/AuthService";
 import {CustomError, HttpStatuses} from "../helpers/ErrorHandler";
 import {UsersQRepo} from "../Repositories/UsersQRepo";
 import {RegServices} from "./Services/RegService";
+import {jwtService} from "./Services/JwtService";
 
 export const authController = {
     register: async (req: Request, res: Response, next: NextFunction) => {
@@ -31,12 +32,25 @@ export const authController = {
 
     login: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const accessToken = await AuthServices.LoginUser(req.body);
-            if (!accessToken) {throw new CustomError("Invalid login token", HttpStatuses.NoContent, [{ message:'Token = '+accessToken, field:'null'}]);}
+            const {refreshToken, accessToken} = await AuthServices.LoginUser(req.body);
+            if (!accessToken) {throw new CustomError("Invalid access token", HttpStatuses.NoContent, [{ message:'access Token = '+accessToken, field:'null'}]);}
+            if (!refreshToken) {throw new CustomError("Invalid refresh token", HttpStatuses.NoContent, [{ message:'refresh Token = '+accessToken, field:'null'}]);}
+
+            res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true,})
             res.status(200).json({accessToken:accessToken});
         } catch (err) {
             next(err)
         }
+    },
+
+    refreshToken: async (req: Request, res: Response, next: NextFunction) => {
+        try{
+            const {newRToken, newAToken} = await AuthServices.refreshAccessToken(req.cookies.refreshToken);
+
+            res.cookie('refreshToken', newRToken, {httpOnly: true, secure: true,})
+            res.status(200).send({accessToken:newAToken})
+        }
+        catch(err){next(err)}
     },
 
     info: async (req: Request, res: Response): Promise<any> => {
@@ -56,5 +70,13 @@ export const authController = {
             }
             return res.status(HttpStatuses.Success).send(result);
         }
+    },
+
+    logout: async (req: Request, res: Response, next: NextFunction) => {
+try{
+    await AuthServices.LogoutUser(req.cookies.refreshToken)
+    res.sendStatus(204)
+}
+catch(err){next(err)}
     }
 }

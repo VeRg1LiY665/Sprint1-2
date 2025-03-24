@@ -6,6 +6,7 @@ export type UserDBType = {
     email: string;
     passwordHash: string;
     createdAt: string;
+    refreshToken: string;
     emailConfirmation: {
         confirmationCode: string;
         expirationDate: Date;

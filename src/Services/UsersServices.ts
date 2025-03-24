@@ -37,6 +37,7 @@ export const UsersServices ={
             passwordHash:passHash,
             _id: new ObjectId(),
             createdAt: new Date().toISOString(),
+            refreshToken: '',
             emailConfirmation: {
                 confirmationCode: '',
                 expirationDate: new Date,
@@ -52,6 +53,5 @@ export const UsersServices ={
     async DeleteUser(id: string): Promise<boolean> {
         return await UsersRepo.DeleteUser(id)
     }
-
 
 }

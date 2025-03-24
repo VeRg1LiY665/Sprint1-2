@@ -9,10 +9,12 @@ import {authRouter} from "./Auth/AuthRouter";
 import {usersRouter} from "./Modules/Users/UsersRouters";
 import {ErrorHandler} from "./helpers/ErrorHandler";
 import {commentsRouter} from "./Modules/Comments/CommentsRouters";
+import cookieParser from "cookie-parser";
 
 export const app = express()
 app.use(express.json())
 app.use(cors())
+app.use(cookieParser())
 
 
 app.get('/', (req, res) => {

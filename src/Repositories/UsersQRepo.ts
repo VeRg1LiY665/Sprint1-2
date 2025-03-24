@@ -53,10 +53,15 @@ let $or = []
     },
 
     mapToOutput(user: UserDBType): UserOutputType {
-        let MappedUser: any = {id: (user._id).toString(), ...user}
-        delete MappedUser._id
+        let MappedUser: any =
+            {id: (user._id).toString(),
+             login: user.login,
+             email: user.email,
+             createdAt: user.createdAt}
+        /*delete MappedUser._id
         delete MappedUser.passwordHash
         delete MappedUser.emailConfirmation
+        delete MappedUser.refreshToken*/
         return MappedUser as UserOutputType
     },
 
