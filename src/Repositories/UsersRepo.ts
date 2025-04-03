@@ -8,7 +8,7 @@ export const UsersRepo = {
     async ShowUser(searchData: string):Promise <UserDBType|null> {
         let filter: any = {};
         switch (true) {
-            case  mongoose.isValidObjectId(searchData): filter._id = new ObjectId(searchData)
+            case  mongoose.isValidObjectId(searchData): filter._id = new ObjectId(searchData)  //ОСТАВИТЬ ПЕРЕДАЧУ СТРИНГИ!!!!
                 break;
             case searchData.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) !== null : filter.email = searchData
                 break;

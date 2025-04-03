@@ -1,29 +1,43 @@
-import {InputLoginType} from "../../IO Types/InputLoginType";
 import {UsersRepo} from "../../Repositories/UsersRepo";
 import {compare} from "bcrypt";
 import {CustomError, HttpStatuses, InvalidCredentialsError} from "../../helpers/ErrorHandler";
 import {jwtService} from "./JwtService";
+import {ObjectId} from "mongodb";
+import {DevicesRepo} from "../../Security/Repositories/DevicesRepo";
+import {DeviceDBType} from "../../Data Types/DeviceDBType";
+import {RefreshTokenPayloadType} from "../Types/RefreshTokenPayloadType";
 
 
 export const AuthServices ={
-    async LoginUser(content: InputLoginType){
-const foundUser = await UsersRepo.ShowUser(content.loginOrEmail)
+    async LoginUser(content: { loginOrEmail:string, password:string, ip: string, title:string }){
+    const foundUser = await UsersRepo.ShowUser(content.loginOrEmail)
 
-if (!foundUser){throw new InvalidCredentialsError('Wrong Credentials', [{message:'Wrong Login or email', field:'loginOrEmail' }]);}
+    if (!foundUser)
+    {throw new InvalidCredentialsError('Wrong Credentials', [{message:'Wrong Login or email', field:'loginOrEmail' }]);}
         else {
             if (!(await compare(content.password, foundUser.passwordHash))){
                 throw new InvalidCredentialsError('Wrong Credentials', [{message:'Wrong Password', field:'password'}]);
             }
 
-        const accessToken= await jwtService.createToken(foundUser._id.toString())
-        const refreshToken= await jwtService.createRToken(foundUser._id.toString())
+        const deviceId = new ObjectId()
 
-    const user = {...foundUser, refreshToken:refreshToken}
+        const accessToken= await jwtService.createToken(foundUser._id ,deviceId)
+        const refreshToken= await jwtService.createRToken(foundUser._id ,deviceId)
 
-    const res = await UsersRepo.UpdateUser(user)
-    if (!res) {throw new CustomError('Unexpected error',
-        HttpStatuses.ServerError,
-        [{message: 'No update happened in db', field: 'null'}])}
+        const  RPayload = await jwtService.decodeRToken(refreshToken)
+        const device = {
+            ip: content.ip,
+            title: content.title,
+            iat: RPayload.iat,
+            exp: RPayload.exp,
+            _id: RPayload.deviceId,
+            userId: RPayload.userId
+        }
+
+        const res = await DevicesRepo.AddDevice(device)
+        if (!res) {throw new CustomError('Unexpected error',
+            HttpStatuses.ServerError,
+            [{message: 'No update happened in db', field: 'null'}])}
 
     return {accessToken, refreshToken}}
     },
@@ -33,51 +47,46 @@ if (!foundUser){throw new InvalidCredentialsError('Wrong Credentials', [{message
 
         const result = await jwtService.verifyToken(token);
 
-        if (!result) { throw new InvalidCredentialsError('Wrong Credentials', [{message:'Wrong token', field:'null' }])
-        }
-        else {return result}
+        return result
     },
 
     async refreshAccessToken(rToken: string){
-    const payload  = await jwtService.verifyRToken(rToken)
-    if (payload===null) {throw new InvalidCredentialsError('Token is incorrect',[{message:'Wrong refresh Token', field:'token'}]);}
+    const payload  = await jwtService.verifyRToken(rToken)  //ошибка валидации выбрасывается в jwtService
 
-    const foundUser = await UsersRepo.ShowUser(payload.userId)
-    if (foundUser===null){throw new InvalidCredentialsError('Token is incorrect',[{message:'User not found based on token data', field:'userId'}])}
+        const foundDevice = await DevicesRepo.ShowDevice(payload.deviceId)
 
-    if(rToken===foundUser.refreshToken) {
-        const newRToken = await jwtService.createRToken(payload.userId)
-        const newAToken = await jwtService.createToken(payload.userId)
+    if(!foundDevice) {
+        throw new InvalidCredentialsError('Token is not valid',
+            [{message:'REFRESH_ERROR:Refresh token is depreciated', field:'token'}])
+    }
+    else {
+        const newRToken = await jwtService.createRToken(payload.userId, payload.deviceId)
+        const newAToken = await jwtService.createToken(payload.userId, payload.deviceId)
 
-        const UpdUser = {...foundUser, refreshToken: newRToken};
-        const res = await UsersRepo.UpdateUser(UpdUser)
-        if (!res) {
-            throw new CustomError('Unexpected error',
-                HttpStatuses.ServerError,
-                [{message: 'No update happened in db', field: 'null'}])
-        }
+        const newRPayload:RefreshTokenPayloadType = await jwtService.decodeRToken(newRToken)
+        const UpdDevice:DeviceDBType = {...foundDevice, iat:newRPayload.iat, exp:newRPayload.exp};
+        const res = await DevicesRepo.UpdateDevice(UpdDevice)
 
         return {newRToken, newAToken}
-    }
-    else {throw new InvalidCredentialsError('Token is not valid',[{message:'REFRESH_ERROR:Refresh token is depreciated', field:'token'}])}
+       }
     },
 
     async LogoutUser(rToken:string){
-        const payload  = await jwtService.verifyRToken(rToken)
-        if (payload===null) {throw new InvalidCredentialsError('Token is incorrect',[{message:'Wrong refresh Token', field:'token'}]);}
+        const payload:RefreshTokenPayloadType  = await jwtService.verifyRToken(rToken)
 
-        const foundUser = await UsersRepo.ShowUser(payload.userId)
-        if (foundUser===null){throw new InvalidCredentialsError('Token is incorrect',[{message:'User not found based on token data', field:'userId'}])}
+        const foundDevice = await DevicesRepo.ShowDevice(payload.deviceId)
+        if (!foundDevice){throw new InvalidCredentialsError('Token is incorrect',
+            [{message:'Device not found based on token data', field:'userId'}])}
 
-        if (rToken===foundUser.refreshToken) {
-            const UpdUser = {...foundUser, refreshToken: ''}
-            const res = await UsersRepo.UpdateUser(UpdUser)
-            if (!res) {
-                throw new CustomError('Unexpected error',
-                    HttpStatuses.ServerError,
-                    [{message: 'No update happened in db', field: 'null'}])
-            }
+        if (payload.iat!==foundDevice.iat)
+        {throw new InvalidCredentialsError('Token is not valid',
+            [{message:'LOGOUT_ERROR:User has been already logged out', field:'token'}])}
+
+        const res = await DevicesRepo.DeleteDevice(foundDevice._id.toString())
+
+        if (!res) {
+            throw new InvalidCredentialsError('Token is not valid',
+                [{message:'LOGOUT_ERROR:User has been already logged out', field:'token'}])
         }
-        else {throw new InvalidCredentialsError('Token is not valid', [{message:'LOGOUT_ERROR:User has been already logged out', field:'token'}])}
     }
 }

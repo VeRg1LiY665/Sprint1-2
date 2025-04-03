@@ -94,7 +94,7 @@ export const ErrorHandler = async(err:any, req:Request, res: Response, next:Next
         console.log(resultErrMessage)
         res.status(err.status).send(resultErrMessage) //пока возвращаю по одной, в перспективе можно копить массив через next, потом возвращать прям массивом ошибки
     }
-    else {console.error(err)
+    else {console.error(err) //если брошена обычная ошибка (например монго отъехала), то она здесь залогируется и обработается
         res.status(500).send(err.message)
-    next()}
+    next()} //по идее можно next убрать - нужно потестить
     }

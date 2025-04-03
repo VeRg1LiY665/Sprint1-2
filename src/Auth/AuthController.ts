@@ -4,6 +4,7 @@ import {CustomError, HttpStatuses} from "../helpers/ErrorHandler";
 import {UsersQRepo} from "../Repositories/UsersQRepo";
 import {RegServices} from "./Services/RegService";
 import {jwtService} from "./Services/JwtService";
+import {DeviceData} from "../helpers/SessionDataValues";
 
 export const authController = {
     register: async (req: Request, res: Response, next: NextFunction) => {
@@ -32,10 +33,14 @@ export const authController = {
 
     login: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const {refreshToken, accessToken} = await AuthServices.LoginUser(req.body);
-            if (!accessToken) {throw new CustomError("Invalid access token", HttpStatuses.NoContent, [{ message:'access Token = '+accessToken, field:'null'}]);}
-            if (!refreshToken) {throw new CustomError("Invalid refresh token", HttpStatuses.NoContent, [{ message:'refresh Token = '+accessToken, field:'null'}]);}
-
+            const {loginOrEmail, password, ip, title} = DeviceData(req)
+            const {refreshToken, accessToken} = await AuthServices.LoginUser({loginOrEmail, password, ip, title});
+            /*if (!accessToken) {throw new CustomError("Invalid access token",
+                HttpStatuses.NoContent,
+                [{ message:'access Token = '+accessToken, field:'null'}]);}
+            if (!refreshToken) {throw new CustomError("Invalid refresh token",
+                HttpStatuses.NoContent,
+                [{ message:'refresh Token = '+refreshToken, field:'null'}]);}*/ //Тоже ненужные проверки, убрать их
             res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true,})
             res.status(200).json({accessToken:accessToken});
         } catch (err) {
@@ -73,10 +78,10 @@ export const authController = {
     },
 
     logout: async (req: Request, res: Response, next: NextFunction) => {
-try{
-    await AuthServices.LogoutUser(req.cookies.refreshToken)
-    res.sendStatus(204)
-}
-catch(err){next(err)}
+    try{
+        await AuthServices.LogoutUser(req.cookies.refreshToken)
+        res.sendStatus(204)
     }
+    catch(err){next(err)}
+        }
 }

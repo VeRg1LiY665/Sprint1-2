@@ -16,5 +16,7 @@ try {
     }
 
 catch (err) {
-    return res.sendStatus(401);}
+   // next(err); //Тут посмотреть, сработает ли проброс в ErrorHandler
+    return res.sendStatus(401);
+    }
 };

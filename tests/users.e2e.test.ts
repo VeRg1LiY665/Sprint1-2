@@ -78,7 +78,7 @@ describe('USERS_TESTS', () => {
             .expect(400);
     });
     it('shouldn`t create user with incorrect password: STATUS 400', async () => {
-        userDto = testingDtosCreator.createUserDto({ pass: 'hh' });
+        userDto = testingDtosCreator.createUserDto({ password: 'hh' });
         await request(app)
             .post(SETTINGS.PATH.USERS)
             .set('Authorization', `Basic YWRtaW46cXdlcnR5`)

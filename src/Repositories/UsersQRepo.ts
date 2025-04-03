@@ -1,4 +1,3 @@
-import {BlogOutputType} from "../IO Types/BlogOutputType";
 import {UserOutputType} from "../IO Types/UserOutputType";
 import {usersCollection} from "../db/mongoDB";
 import {UserDBType} from "../Data Types/UserDBType";

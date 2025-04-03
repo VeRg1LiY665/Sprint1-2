@@ -9,6 +9,8 @@ export const SETTINGS = {
         USERS: '/users',
         AUTH: '/auth',
         COMMENTS: '/comments',
+        DEVICES: '/security/devices',
+        REQUESTS: '/requests',
     },
     PASS: process.env.PASSWORD,
     LOGIN: process.env.LOGIN,
