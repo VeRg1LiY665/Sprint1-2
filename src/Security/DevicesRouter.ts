@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {devicesController} from "./DevicesController";
-import {accessTokenGuard} from "../Auth/guards/AccesTokenGuard";
+import {ObjectIdValidationMiddleware} from "../Modules/Blogs/BlogsMiddlewares";
 
 export const devicesRouter = Router();
 
@@ -11,4 +11,5 @@ devicesRouter.delete('/',
     devicesController.deleteAllDevices);
 
 devicesRouter.delete('/:id',
+    ObjectIdValidationMiddleware,
     devicesController.deleteDevice);

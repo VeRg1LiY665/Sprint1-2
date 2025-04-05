@@ -2,10 +2,15 @@ import {ReqDBType} from "../../Data Types/ReqDBType";
 import {requestsCollection} from "../../db/mongoDB";
 
 export const RequestsRepo = {
-    async ShowRequests(content: {ip:string, URL: string, DateToSearch:Date}): Promise<ReqDBType[]> {
-        const res = await requestsCollection.find(
-            {$and:[{ip : content.ip}, {URL:content.URL}, {date: {$lte:content.DateToSearch}},]})
-            .toArray()
+    async CountRequests(content: {ip:string, URL: string, DateToSearch:Date}): Promise<number> {
+        const res = await requestsCollection.countDocuments(
+            {$and:[
+                {ip : content.ip},
+                {URL:content.URL},
+                {date: {$gte:content.DateToSearch}}
+                ]}
+        )
+
         return res
     },
 

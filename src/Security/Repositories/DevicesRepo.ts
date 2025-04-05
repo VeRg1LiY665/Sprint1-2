@@ -21,8 +21,10 @@ export const DevicesRepo = {
     },
 
     async UpdateDevice(device:DeviceDBType): Promise<boolean> {
+        let filter: any = {};
+        filter._id = device._id.toString();
         const res = await devicesCollection.updateOne(
-            {_id: device._id},
+            filter, //тут смотреть, если опять не заработает!!!
             {$set:{...device}}
         )
 

@@ -89,12 +89,14 @@ export class DuplicatedEmailError extends Error{
 
 export const ErrorHandler = async(err:any, req:Request, res: Response, next:NextFunction) => {
 
-    if (err.status!==undefined) {
+    if (err.status !== undefined) {
         const resultErrMessage = {errorsMessages: err.extensions}; //здесь привел вывод ошибки к тому что ожидается тестами
-        console.log(resultErrMessage)
+        //console.log(resultErrMessage)
         res.status(err.status).send(resultErrMessage) //пока возвращаю по одной, в перспективе можно копить массив через next, потом возвращать прям массивом ошибки
-    }
-    else {console.error(err) //если брошена обычная ошибка (например монго отъехала), то она здесь залогируется и обработается
+    } else {
+        console.error(err) //если брошена обычная ошибка (например монго отъехала), то она здесь залогируется и обработается
         res.status(500).send(err.message)
-    next()} //по идее можно next убрать - нужно потестить
+       // next()
+     //по идее можно next убрать - нужно потестить
     }
+}

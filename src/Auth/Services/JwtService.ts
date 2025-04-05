@@ -13,7 +13,7 @@ export const jwtService = {
     },
 
     async createRToken(userId:ObjectId, deviceId: ObjectId): Promise<string> {
-        return jwt.sign({userId, deviceId},
+        return jwt.sign({userId, deviceId, iat : Math.floor(Date.now())}, //implemented iat in ms
             SETTINGS.R_SECRET,
             {expiresIn: +SETTINGS.R_TIME}
         );
@@ -41,7 +41,7 @@ export const jwtService = {
     },
 
     async decodeRToken(token: string): Promise<RefreshTokenPayloadType> {
-        try { //По идее можно обойтись только verify, но тут вопрос производтельности - decode побыстрее должен быть
+        try { //По идее можно обойтись только verify, но тут вопрос производительности - decode побыстрее должен быть
             return jwt.decode(token) as RefreshTokenPayloadType;
         } catch (e) {
             console.error("Can't decode token", e);

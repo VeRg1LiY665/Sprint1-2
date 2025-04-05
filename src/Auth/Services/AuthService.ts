@@ -1,6 +1,6 @@
 import {UsersRepo} from "../../Repositories/UsersRepo";
 import {compare} from "bcrypt";
-import {CustomError, HttpStatuses, InvalidCredentialsError} from "../../helpers/ErrorHandler";
+import {CustomError, HttpStatuses, InvalidCredentialsError, NotFoundError} from "../../helpers/ErrorHandler";
 import {jwtService} from "./JwtService";
 import {ObjectId} from "mongodb";
 import {DevicesRepo} from "../../Security/Repositories/DevicesRepo";
@@ -59,13 +59,20 @@ export const AuthServices ={
         throw new InvalidCredentialsError('Token is not valid',
             [{message:'REFRESH_ERROR:Refresh token is depreciated', field:'token'}])
     }
+
+    if (payload.iat!==foundDevice.iat)
+        {throw new InvalidCredentialsError('Token is not valid',
+            [{message:'LOGOUT_ERROR:User has been already logged out', field:'token'}])}
     else {
         const newRToken = await jwtService.createRToken(payload.userId, payload.deviceId)
         const newAToken = await jwtService.createToken(payload.userId, payload.deviceId)
 
         const newRPayload:RefreshTokenPayloadType = await jwtService.decodeRToken(newRToken)
         const UpdDevice:DeviceDBType = {...foundDevice, iat:newRPayload.iat, exp:newRPayload.exp};
+
         const res = await DevicesRepo.UpdateDevice(UpdDevice)
+        if (!res)
+        {throw new NotFoundError('Device not found in repo')} //чтобы проверить работу фильтра при апдейте
 
         return {newRToken, newAToken}
        }

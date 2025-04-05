@@ -9,22 +9,21 @@ export const rateLimiter = async (req:Request, res:Response, next:NextFunction) 
     const RequestToApi = {
         _id : new ObjectId(),
         ip : ip,
-        URL : req.baseUrl,
-        date: new Date()
+        URL : req.originalUrl,
+        date: new Date
     }
 
     const ReqLimit = 5; // Max requests
     const TimeLimit = 10 * 1000; // 10 sec
 
     const DateToSearch = new Date(RequestToApi.date.getTime()-TimeLimit) // convert date -> ms, subtract 10 sec in ms, convert ms->date
-    //const DateToSearch = RequestToApi.date.getTime()/1000 - TimeLimit //time in sec
+
 
     await RequestsRepo.AddRequest(RequestToApi)
-    const requests = await RequestsRepo.ShowRequests({ip: RequestToApi.ip, URL: RequestToApi.URL, DateToSearch:DateToSearch})
+    const requests = await RequestsRepo.CountRequests({ip: RequestToApi.ip, URL: RequestToApi.URL, DateToSearch:DateToSearch})
 
-    if (requests.length > ReqLimit) {
+    if (requests > ReqLimit) {
         res.status(429).json({ message: 'Too many requests, try again later.' });
     }
-
-    next();
+    else {next()}
 };

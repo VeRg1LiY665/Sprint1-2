@@ -4,15 +4,16 @@ import {SETTINGS} from "../src/settings";
 import request from "supertest";
 import {app} from "../src/app";
 import {createUser, createUsers} from "./utils/createUsers";
+import {delay} from "./test-helpers";
 
 describe('AUTH_TESTS', () => {
     beforeAll(async () => {
         const mongoServer = await MongoMemoryServer.create();
         await db.runDB(mongoServer.getUri());
-        await db.drop();
+        //await db.drop();
     });
 
-    /*beforeEach(async () => {
+   /* beforeEach(async () => {
         await db.drop();
     });*/
 
@@ -28,7 +29,7 @@ describe('AUTH_TESTS', () => {
     let ATokens:any = []
     let RTokens:any = []
 
-    it('should remove all data', async()=>{
+    it('should remove all data, STATUS:204', async()=>{
         await request(app)
             .delete('/testing/all-data/')
             .expect(204)
@@ -77,7 +78,7 @@ describe('AUTH_TESTS', () => {
         Devices = resp.body
     })
 
-    it ('should remove second device, STATUS:204', async () =>{
+    it ('should remove second device of user1, STATUS:204', async () =>{
 
         await request(app)
             .delete(`${SETTINGS.PATH.DEVICES + '/' + Devices[1].deviceId}`)
@@ -91,7 +92,7 @@ describe('AUTH_TESTS', () => {
         expect (resp.body.length).toBe(3)
     })
 
-    it ('should remove all devices except first', async()=>{
+    it ('should remove all devices of user1 except first, STATUS:200, 1 device in list', async()=>{
         await request(app)
             .delete(`${SETTINGS.PATH.DEVICES + '/'}`)
             .set('Cookie', RTokens[0])
@@ -108,6 +109,7 @@ describe('AUTH_TESTS', () => {
         Devices=[]
         ATokens=[]
         RTokens=[]
+    delay(10000)
 
         for (let i = 0; i < 2; i++) {
             const res = await request(app)
@@ -136,9 +138,28 @@ describe('AUTH_TESTS', () => {
             .delete(`${SETTINGS.PATH.DEVICES + '/'+ Devices[0].deviceId}`)
             .set('Cookie', RTokens[1])
             .expect(403)
+    }, 15000) //delay to avoid rateLimiter
+
+    it('should depreciate token after refresh, STATUS:401', async()=>{
+
+        const resp = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/refresh-token')
+            .set('Cookie', RTokens[0])
+            .expect(200)
+        expect (resp.body.accessToken).toContain('.')
+
+        await request(app)
+            .post(SETTINGS.PATH.AUTH + '/refresh-token')
+            .set('Cookie', RTokens[0])
+            .expect(401)
+
+        await request(app)
+            .post(SETTINGS.PATH.AUTH + '/logout')
+            .set('Cookie', RTokens[0])
+            .expect(401)
     })
 
-    it('should remove all data', async()=>{
+    it('should remove all data, STATUS:204', async()=>{
         await request(app)
             .delete('/testing/all-data/')
             .expect(204)
@@ -147,4 +168,58 @@ describe('AUTH_TESTS', () => {
         ATokens=[]
         RTokens=[]
     })
+
+    it ('should depreciate token after logout, STATUS:401', async()=>{
+       RTokens=[] //обнулили массив токенов
+
+        await createUser(app)
+        const res = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/login')
+            .set('user-agent', 'Agent')
+            .send({
+                loginOrEmail: 'test',
+                password: '123456789'
+            })
+            .expect(200);
+
+        const RToken = res.headers['set-cookie'][0].split(';');  //парсим рефреш токен
+        RTokens.push(RToken[0]);
+
+        await request(app) //пробуем логаут
+            .post(SETTINGS.PATH.AUTH + '/logout')
+            .set('Cookie', RTokens[0])
+            .expect(204)
+
+        const resp = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/refresh-token')
+            .set('Cookie', RTokens[0])
+            .expect(401)
+    })
+
+    it('should remove all data, STATUS:204', async()=>{
+        await request(app)
+            .delete('/testing/all-data/')
+            .expect(204)
+
+        Devices=[]
+        ATokens=[]
+        RTokens=[]
+    })
+
+    it ('should block access if more than 5 attempts/10 sec, use API: /auth/login, STATUS:403', async()=>{
+    await createUser(app);
+       let StatusCode:number = 0
+        for (let i = 0; i < 6; i++) {
+            const res = await request(app)
+                .post(SETTINGS.PATH.AUTH + '/login')
+                .set('user-agent', 'Agent')
+                .send({
+                    loginOrEmail: `test`,
+                    password: '123456789'
+                })
+            StatusCode = res.statusCode;
+        }
+        expect(StatusCode).toBe(429)
+})
+
 });
