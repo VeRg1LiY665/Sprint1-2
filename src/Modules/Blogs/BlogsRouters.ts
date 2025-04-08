@@ -1,4 +1,4 @@
-import {blogsController} from "./BlogsController";
+import {ioc} from "../../composition-root";
 import {
     BlogDescriptionValidation,
     BlogNameValidation,
@@ -19,21 +19,22 @@ import {
     PostTitleValidation
 } from "../Posts/PostsMiddlewares";
 import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
+import {BlogsController} from "./BlogsController";
 
 export const blogRouter = Router();
-
+const blogsController = ioc.getInstance<BlogsController>(BlogsController);
 blogRouter.get('/',
     BlogQueryPageNumberValidation,
     BlogQueryPageSizeValidation,
     BlogQuerySortByValidation,
     BlogQuerySortDirectionValidation,
     ErrorCollectionMiddleware,
-    blogsController.getBlogs)
+    blogsController.getBlogs.bind(blogsController))
 
 blogRouter.get('/:id',
     ObjectIdValidationMiddleware,
     ErrorCollectionMiddleware,
-    blogsController.getBlogByID)
+    blogsController.getBlogByID.bind(blogsController))
 
 blogRouter.get('/:id/posts',
     ObjectIdValidationMiddleware,
@@ -41,7 +42,7 @@ blogRouter.get('/:id/posts',
     BlogQueryPageSizeValidation,
     BlogQuerySortByValidation,
     BlogQuerySortDirectionValidation,
-    postsController.getPostsForBlog)
+    postsController.getPostsForBlog.bind(postsController))
 
 blogRouter.post('/:id/posts',
     authMiddleware,
@@ -50,7 +51,7 @@ blogRouter.post('/:id/posts',
     PostShortDescriptionValidation,
     PostContentValidation,
     ErrorCollectionMiddleware,
-    postsController.createPostForBlog)
+    postsController.createPostForBlog.bind(postsController))
 
 blogRouter.post('/',
     authMiddleware,
@@ -59,14 +60,14 @@ blogRouter.post('/',
     BlogUrlLengthValidation,
     BlogUrlValidation,
     ErrorCollectionMiddleware,
-    blogsController.createBlog)
+    blogsController.createBlog.bind(blogsController))
 
 blogRouter.delete('/:id',
     authMiddleware,
     ObjectIdValidationMiddleware,
     ObjectIdValidationMiddleware,
     ErrorCollectionMiddleware,
-    blogsController.deleteBlog)
+    blogsController.deleteBlog.bind(blogsController))
 
 blogRouter.put('/:id',
     authMiddleware,
@@ -76,4 +77,4 @@ blogRouter.put('/:id',
     BlogUrlValidation,
     ErrorCollectionMiddleware,
     ObjectIdValidationMiddleware,
-    blogsController.updateBlog)
+    blogsController.updateBlog.bind(blogsController))

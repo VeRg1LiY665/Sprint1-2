@@ -24,14 +24,14 @@ postRouter.get('/',
     PostQuerySortByValidation,
     PostQuerySortDirectionValidation,
     ErrorCollectionMiddleware,
-    postsController.getPosts)
+    postsController.getPosts.bind(postsController))
 
 postRouter.get('/:id',
     ObjectIdValidationMiddleware,
-    postsController.getPostByID)
+    postsController.getPostByID.bind(postsController))
 
 postRouter.get('/:id/comments',
-    commentsController.getComments)
+    commentsController.getComments.bind(commentsController))
 
 postRouter.post('/',
     authMiddleware,
@@ -39,18 +39,18 @@ postRouter.post('/',
     PostShortDescriptionValidation,
     PostContentValidation,
     ErrorCollectionMiddleware,
-    postsController.createPost)
+    postsController.createPost.bind(postsController))
 
 postRouter.post('/:id/comments',
     accessTokenGuard,
     CommentContentValidation,
     ErrorCollectionMiddleware,
-    commentsController.createComment)
+    commentsController.createComment.bind(commentsController))
 
 postRouter.delete('/:id',
     authMiddleware,
     ObjectIdValidationMiddleware,
-    postsController.deletePost)
+    postsController.deletePost.bind(postsController))
 
 postRouter.put('/:id',
     authMiddleware,
@@ -59,4 +59,4 @@ postRouter.put('/:id',
     PostContentValidation,
     ErrorCollectionMiddleware,
     ObjectIdValidationMiddleware,
-    postsController.updatePost)
+    postsController.updatePost.bind(postsController))

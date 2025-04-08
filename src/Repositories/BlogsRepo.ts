@@ -3,7 +3,7 @@ import {blogsCollection, postsCollection} from "../db/mongoDB";
 import {ObjectId} from "mongodb";
 import {BlogDBType} from "../Data Types/BlogDBType";
 
-class BlogRepo {
+export class BlogsRepo {
     async ShowBlogByID (id:string) {
         const _id = new ObjectId(id)
         const blog = await blogsCollection.findOne({_id: _id});
@@ -37,8 +37,8 @@ class BlogRepo {
         return res.matchedCount === 1;
     }
 }
-//TODO refactor export const names
-export const BlogsRepo = new BlogRepo();
+
+//export const BlogsRepo = new BlogRepo();
 
 /*
 export const BlogsRepo = {

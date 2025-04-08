@@ -3,7 +3,9 @@ import {ObjectId} from "mongodb";
 import {BlogsRepo} from "../Repositories/BlogsRepo";
 import {BlogDBType} from "../Data Types/BlogDBType";
 
-class BlogsService { // new class description
+export class BlogsServices { // new class description
+    constructor(protected blogsRepo: BlogsRepo) {}  //create new instance of Repo during Service creation
+
     async SetUpNewBlog(content:InputBlogType){
         const blog = new BlogDBType(
             new ObjectId(),
@@ -13,22 +15,22 @@ class BlogsService { // new class description
             new Date().toISOString(),
             false)
 
-        return await BlogsRepo.SetUpNewBlog(blog)
+        return await this.blogsRepo.SetUpNewBlog(blog)
 
     }
 
     async UpdateBlog (id:string, content:InputBlogType){
-        return await BlogsRepo.ChangeBlog(id, content)
+        return await this.blogsRepo.ChangeBlog(id, content)
 
     }
 
     async DeleteBlog (id:string){
-        return await BlogsRepo.DeleteBlog(id)
+        return await this.blogsRepo.DeleteBlog(id)
 
     }
 }
 
-export const BlogsServices = new BlogsService(); //new class instance
+//export const BlogsServices = new BlogsService(); //new class instance
 
 /*
 export const BlogsServices = {

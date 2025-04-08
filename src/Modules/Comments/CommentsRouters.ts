@@ -8,16 +8,16 @@ export const commentsRouter = Router();
 
 commentsRouter.get('/:id',
     IDValidationMiddleware,
-    commentsController.getCommentByID)
+    commentsController.getCommentByID.bind(commentsController))
 
 commentsRouter.delete('/:id',
     accessTokenGuard,
     IDValidationMiddleware,
-    commentsController.deleteComment)
+    commentsController.deleteComment.bind(commentsController))
 
 commentsRouter.put('/:id',
     accessTokenGuard,
     IDValidationMiddleware,
     CommentContentValidation,
     ErrorCollectionMiddleware,
-    commentsController.updateComment)
+    commentsController.updateComment.bind(commentsController))
