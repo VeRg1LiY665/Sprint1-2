@@ -4,39 +4,54 @@ import {SETTINGS} from '../src/settings'
 import {datasetblog, datasetpost} from "./datasets";
 import {InputBlogType} from "../src/IO Types/InputBlogType";
 import {InputPostType} from "../src/IO Types/InputPostType";
+import {MongoMemoryServer} from "mongodb-memory-server";
+import {db} from "../src/db/mongoDB";
+import request from "supertest";
+import {app} from "../src/app";
 
 
 describe('/posts', () => {
     beforeAll(async () => { // очистка базы данных перед началом тестирования
-         //setDB()
+        const mongoServer = await MongoMemoryServer.create();
+        await db.runDB(mongoServer.getUri());
      })
 
-    it('should get empty array', async () => {
-         setDB() // очистка базы данных
+    afterAll(async () => {
+        await db.stop();
+    });
+
+    afterAll((done) => {
+        done();
+    });
+
+    it('should remove all data, STATUS:204', async()=>{
+        await request(app)
+            .delete('/testing/all-data/')
+            .expect(204)
+    })
+
+    it('should get empty array, STATUS:200', async () => {
 
         const res = await req
             .get(SETTINGS.PATH.POSTS)
             .expect(200)
 
-        console.log(res.body)
-
          expect(res.body.length).toBe(0)
     })
-    it('should get not empty array', async () => {
-         
+
+    it('should create post, STATUS:200', async () => {
+         //TODO переделать тесты начина отсюда
         setDB(datasetblog,datasetpost)
 
         const res = await req
             .get(SETTINGS.PATH.POSTS)
             .expect(200)
 
-        console.log(res.body[0])
-
          expect(res.body.length).toBe(1)
              expect(res.body[0]).toEqual(datasetpost)
     })
 
- it('should create', async () => {
+    it('should create', async () => {
          setDB(datasetblog)
          const newPost: InputPostType = {
              title: 'string',
@@ -66,7 +81,7 @@ describe('/posts', () => {
         console.log(res.body)
     })
 
-     it('shouldn\'t find', async () => {
+    it('should not find', async () => {
          const res = await req
              .get(SETTINGS.PATH.POSTS + '/1')
              .expect(404)

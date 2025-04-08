@@ -14,6 +14,8 @@ export const UsersRepo = {
                 break;
             case searchData.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i) !== null : filter["emailConfirmation.confirmationCode"] = searchData
                 break;
+            case searchData.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}-rq$/) !== null : filter["emailConfirmation.recoveryCode"] = searchData
+                break;
             default: filter.login = searchData
         }
 

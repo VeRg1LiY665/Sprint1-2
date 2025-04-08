@@ -59,6 +59,5 @@ return {
     totalCount: dto.blogsCount,
     items: dto.blogs
 }
-
     }
 }

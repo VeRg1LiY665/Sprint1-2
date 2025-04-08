@@ -41,7 +41,11 @@ export const UsersServices ={
             emailConfirmation: {
                 confirmationCode: '',
                 expirationDate: new Date,
-                isConfirmed: true}
+                isConfirmed: true},
+            passwordRecovery: {
+                recoveryCode: '',
+                expirationDate: new Date,
+            },
         } as UserDBType
 
         return CreateResult =  {

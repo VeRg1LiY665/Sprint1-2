@@ -1,3 +1,5 @@
+import {InputBlogType} from "../../src/IO Types/InputBlogType";
+
 export type UserDto = {
     login: string
     email: string
@@ -28,4 +30,27 @@ export const testingDtosCreator = {
         }
         return users;
     },
+
+    createBlogDto(content: Partial<InputBlogType>): InputBlogType {
+        return {
+            name: content.name ?? 'test',
+            description: content.description ?? 'description example',
+            websiteUrl: content.websiteUrl ?? 'www.example.com',
+
+        }
+    },
+
+    createBlogDtos(count:number): InputBlogType[] {
+        const blogs =[]
+
+        for (let i = 0; i <= count; i++) {
+            blogs.push({
+                name: `testname${i}`,
+                description: `description example for test blog №${i}`,
+                websiteUrl: `www.example${i}.com`,
+
+            })
+        }
+        return blogs
+    }
 }

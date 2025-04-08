@@ -34,7 +34,11 @@ export const RegServices={
             emailConfirmation: {
                 confirmationCode: randomUUID(),
                 expirationDate: new Date,
-                isConfirmed: false}
+                isConfirmed: false},
+            passwordRecovery: {
+                recoveryCode: '',
+                expirationDate: new Date,
+            }
         } as UserDBType
 
     const res = await UsersRepo.SetUpNewUser(user)
@@ -89,6 +93,7 @@ export const RegServices={
                                                                        [{message:'Email has been already confirmed', field:'email'}])}
 
         foundUser.emailConfirmation.confirmationCode = randomUUID()
+        foundUser.emailConfirmation.expirationDate = new Date;
         const res = await UsersRepo.UpdateUser(foundUser)
         if (!res) {throw new CustomError("Confirmation code resend error",
             HttpStatuses.ServerError,

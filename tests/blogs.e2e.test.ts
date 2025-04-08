@@ -6,6 +6,7 @@ import {InputBlogType} from "../src/IO Types/InputBlogType";
 
 
 describe('/blogs', () => {
+    //TODO переводим тесты на монго и классы
     beforeAll(async () => { // очистка базы данных перед началом тестирования
          setDB()
      })
@@ -21,6 +22,7 @@ describe('/blogs', () => {
 
          expect(res.body.length).toBe(0)
     })
+
     it('should get not empty array', async () => {
          
         setDB(datasetblog)
@@ -35,7 +37,7 @@ describe('/blogs', () => {
              expect(res.body[0]).toEqual(datasetblog)
     })
 
- it('should create', async () => {
+    it('should create', async () => {
          setDB()
          const newBlog: InputBlogType = {
              name: 'string',
@@ -64,7 +66,7 @@ describe('/blogs', () => {
         console.log(res.body)
     })
 
-     it('shouldn\'t find', async () => {
+    it('shouldn\'t find', async () => {
         //setDB(dataset1)
          //console.log(dataset1)
          const res = await req

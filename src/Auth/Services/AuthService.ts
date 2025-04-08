@@ -1,11 +1,15 @@
 import {UsersRepo} from "../../Repositories/UsersRepo";
-import {compare} from "bcrypt";
+import {compare, hash} from "bcrypt";
 import {CustomError, HttpStatuses, InvalidCredentialsError, NotFoundError} from "../../helpers/ErrorHandler";
 import {jwtService} from "./JwtService";
 import {ObjectId} from "mongodb";
 import {DevicesRepo} from "../../Security/Repositories/DevicesRepo";
 import {DeviceDBType} from "../../Data Types/DeviceDBType";
 import {RefreshTokenPayloadType} from "../Types/RefreshTokenPayloadType";
+import {randomUUID} from "node:crypto";
+import {nodemailerService} from "../adapters/nodemailer-adapter";
+import {emailExamples} from "../adapters/EmailExamples";
+import {InputNewPassType} from "../../IO Types/InputNewPassType";
 
 
 export const AuthServices ={
@@ -95,5 +99,51 @@ export const AuthServices ={
             throw new InvalidCredentialsError('Token is not valid',
                 [{message:'LOGOUT_ERROR:User has been already logged out', field:'token'}])
         }
+    },
+
+    async passwordRecovery(email: string){
+        const foundUser = await UsersRepo.ShowUser(email)
+        if (!foundUser)
+        {return}
+
+        foundUser.passwordRecovery.recoveryCode = randomUUID() + 'rq'
+        foundUser.passwordRecovery.expirationDate = new Date(Date.now()+86400000) //текущая + сутки в мс
+        await UsersRepo.UpdateUser(foundUser)  //в принципе можно не проверять на ошибку обновления(наверное)
+
+        nodemailerService
+            .sendEmail(
+                foundUser.email,
+                foundUser.passwordRecovery.recoveryCode,
+                emailExamples.passwordRecoveryEmail
+            )
+            .catch(err => console.error('email not sent, exception:', err))
+
+        return
+    },
+
+    async newPassword(content:InputNewPassType){
+        const isUuid = new RegExp
+        (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}-rq$/i)  //rq - отличие passConfCode от EmailConfCode
+            .test(content.recoveryCode)
+
+        if (!isUuid) {throw new CustomError("Invalid confirmation code",
+            HttpStatuses.BadRequest,
+            [{message:'Confirmation code does not match regexp', field:'code'}])}
+
+        const foundUser = await UsersRepo.ShowUser(content.recoveryCode) //TODO проверить, что поиск адаптирован
+        if (foundUser===null) {throw new CustomError("Invalid confirmation code",
+            HttpStatuses.BadRequest,
+            [{message:'Invalid confirmation code',field:'code' }])}
+
+        if (Date.now() > foundUser.passwordRecovery.expirationDate.getTime()){throw new CustomError("Confirmation error",
+            HttpStatuses.BadRequest,
+            [{message:'Confirmation code has been expired', field:'code'}])}
+
+        foundUser.passwordRecovery.recoveryCode = ''  //сбрасываем код после использования
+        foundUser.passwordHash = await hash(content.newPassword, 10)  //обновляем хэш пароля в дб
+
+        await UsersRepo.UpdateUser(foundUser)  // обновляем юзера
+
+        return;
     }
 }

@@ -41,7 +41,6 @@ blogRouter.get('/:id/posts',
     BlogQueryPageSizeValidation,
     BlogQuerySortByValidation,
     BlogQuerySortDirectionValidation,
-
     postsController.getPostsForBlog)
 
 blogRouter.post('/:id/posts',

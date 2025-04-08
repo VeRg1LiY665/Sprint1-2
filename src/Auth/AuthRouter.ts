@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {authController} from "./AuthController";
-import {UserLoginOrEmailValidation} from "./Middlewares/AuthMiddlewares";
+import {passwordRecoveryValidation, UserLoginOrEmailValidation} from "./Middlewares/AuthMiddlewares";
 import {accessTokenGuard} from "./guards/AccesTokenGuard";
 import {UserEmailValidation, UserLoginValidation, UserPasswordValidation} from "../Modules/Users/UsersMiddlewares";
 import {ErrorCollectionMiddleware} from "../helpers/InputValidation";
@@ -40,6 +40,17 @@ authRouter.post('/refresh-token',
 authRouter.get('/me',
     accessTokenGuard,
     authController.info)
+
+authRouter.post('/password-recovery',
+    rateLimiter,
+    UserEmailValidation,
+    ErrorCollectionMiddleware,
+    authController.passwordRecovery)
+
+authRouter.post('/new-password',
+    rateLimiter,
+    passwordRecoveryValidation,
+    authController.newPassword)
 
 authRouter.post('/logout',
     authController.logout)

@@ -109,7 +109,7 @@ describe('AUTH_TESTS', () => {
         Devices=[]
         ATokens=[]
         RTokens=[]
-    delay(10000)
+    delay(10000) //ждем десять секунд для очистки очереди
 
         for (let i = 0; i < 2; i++) {
             const res = await request(app)
