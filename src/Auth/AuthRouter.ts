@@ -50,6 +50,7 @@ authRouter.post('/password-recovery',
 authRouter.post('/new-password',
     rateLimiter,
     passwordRecoveryValidation,
+    ErrorCollectionMiddleware,
     authController.newPassword)
 
 authRouter.post('/logout',

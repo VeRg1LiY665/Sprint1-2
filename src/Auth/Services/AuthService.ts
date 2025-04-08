@@ -102,11 +102,12 @@ export const AuthServices ={
     },
 
     async passwordRecovery(email: string){
+
         const foundUser = await UsersRepo.ShowUser(email)
         if (!foundUser)
         {return}
 
-        foundUser.passwordRecovery.recoveryCode = randomUUID() + 'rq'
+        foundUser.passwordRecovery.recoveryCode = randomUUID() + '-rq'
         foundUser.passwordRecovery.expirationDate = new Date(Date.now()+86400000) //текущая + сутки в мс
         await UsersRepo.UpdateUser(foundUser)  //в принципе можно не проверять на ошибку обновления(наверное)
 
@@ -128,21 +129,22 @@ export const AuthServices ={
 
         if (!isUuid) {throw new CustomError("Invalid confirmation code",
             HttpStatuses.BadRequest,
-            [{message:'Confirmation code does not match regexp', field:'code'}])}
+            [{message:'Confirmation code does not match regexp', field:'recoveryCode'}])}
 
         const foundUser = await UsersRepo.ShowUser(content.recoveryCode) //TODO проверить, что поиск адаптирован
-        if (foundUser===null) {throw new CustomError("Invalid confirmation code",
+        if (foundUser===null) {throw new CustomError("Invalid recovery code",
             HttpStatuses.BadRequest,
-            [{message:'Invalid confirmation code',field:'code' }])}
+            [{message:'Invalid recovery code',field:'recoveryCode' }])}
 
         if (Date.now() > foundUser.passwordRecovery.expirationDate.getTime()){throw new CustomError("Confirmation error",
             HttpStatuses.BadRequest,
             [{message:'Confirmation code has been expired', field:'code'}])}
 
         foundUser.passwordRecovery.recoveryCode = ''  //сбрасываем код после использования
-        foundUser.passwordHash = await hash(content.newPassword, 10)  //обновляем хэш пароля в дб
+        const passhash = await hash(content.newPassword, 10)
+        foundUser.passwordHash = passhash  //обновляем хэш пароля в дб
 
-        await UsersRepo.UpdateUser(foundUser)  // обновляем юзера
+        const res = await UsersRepo.UpdateUser(foundUser)  // обновляем юзера
 
         return;
     }

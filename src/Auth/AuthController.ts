@@ -79,7 +79,7 @@ export const authController = {
 
     passwordRecovery: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await AuthServices.passwordRecovery(req.body)
+            await AuthServices.passwordRecovery(req.body.email)
             res.sendStatus(HttpStatuses.NoContent) //По тз, если входную валидацию прошли - кидаем 204 в любом случае
         }
         catch(err){next(err)}
@@ -89,7 +89,7 @@ export const authController = {
         try {
             await AuthServices.newPassword(req.body)
 
-            res.sendStatus(HttpStatuses.Success)
+            res.sendStatus(HttpStatuses.NoContent)
         }
         catch(err){next(err)}
     },

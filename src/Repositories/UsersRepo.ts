@@ -7,6 +7,7 @@ export const UsersRepo = {
 
     async ShowUser(searchData: string):Promise <UserDBType|null> {
         let filter: any = {};
+
         switch (true) {
             case  mongoose.isValidObjectId(searchData): filter._id = new ObjectId(searchData)  //ОСТАВИТЬ ПЕРЕДАЧУ СТРИНГИ!!!!
                 break;
@@ -14,7 +15,7 @@ export const UsersRepo = {
                 break;
             case searchData.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i) !== null : filter["emailConfirmation.confirmationCode"] = searchData
                 break;
-            case searchData.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}-rq$/) !== null : filter["emailConfirmation.recoveryCode"] = searchData
+            case searchData.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}-rq$/) !== null : filter["passwordRecovery.recoveryCode"] = searchData
                 break;
             default: filter.login = searchData
         }
