@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {usersController} from "./UsersController";
+import {ioc} from "../../composition-root";
 import {
     ObjectIdValidationMiddleware,
     UserEmailValidation,
@@ -12,8 +12,10 @@ import {
 } from "./UsersMiddlewares";
 import {authMiddleware} from "../../Auth/Middlewares/BasicAuth";
 import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
+import {UsersController} from "./UsersController";
 
 export const usersRouter = Router();
+const usersController = ioc.getInstance<UsersController>(UsersController)
 
 usersRouter.get('/',
     UserQueryPageSizeValidation,
@@ -21,7 +23,7 @@ usersRouter.get('/',
     UserQuerySortDirectionValidation,
     UserQuerySortByValidation,
     ErrorCollectionMiddleware,
-    usersController.getUsers);
+    usersController.getUsers.bind(usersController));
 
 usersRouter.post('/',
     authMiddleware,
@@ -29,9 +31,9 @@ usersRouter.post('/',
     UserPasswordValidation,
     UserEmailValidation,
     ErrorCollectionMiddleware,
-    usersController.createUser);
+    usersController.createUser.bind(usersController));
 
 usersRouter.delete('/:id',
     authMiddleware,
     ObjectIdValidationMiddleware,
-    usersController.deleteUser);
+    usersController.deleteUser.bind(usersController));
