@@ -11,6 +11,7 @@ export const SETTINGS = {
         COMMENTS: '/comments',
         DEVICES: '/security/devices',
         REQUESTS: '/requests',
+        LIKES: '/likes',
     },
     PASS: process.env.PASSWORD,
     LOGIN: process.env.LOGIN,
