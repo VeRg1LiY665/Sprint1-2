@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {ioc} from "../../composition-root";
+import {container} from "../../composition-root";
 import {
     ObjectIdValidationMiddleware,
     UserEmailValidation,
@@ -15,7 +15,7 @@ import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
 import {UsersController} from "./UsersController";
 
 export const usersRouter = Router();
-const usersController = ioc.getInstance<UsersController>(UsersController)
+const usersController = container.get(UsersController)
 
 usersRouter.get('/',
     UserQueryPageSizeValidation,

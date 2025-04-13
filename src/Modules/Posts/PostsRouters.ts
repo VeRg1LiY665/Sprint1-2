@@ -1,4 +1,4 @@
-import {postsController} from "./PostsController";
+import {PostsController} from "./PostsController";
 import {
     PostContentValidation,
     PostQueryPageNumberValidation,
@@ -13,10 +13,14 @@ import {Router} from "express";
 import {authMiddleware} from "../../Auth/Middlewares/BasicAuth";
 import {ObjectIdValidationMiddleware} from "../Blogs/BlogsMiddlewares";
 import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
-import {commentsController} from "../Comments/CommentsController";
+import {CommentsController} from "../Comments/CommentsController";
 import {accessTokenGuard} from "../../Auth/guards/AccesTokenGuard";
 import {CommentContentValidation} from "../Comments/CommentsMiddlewares";
+import {container} from "../../composition-root";
 export const postRouter = Router();
+
+const postsController = container.get(PostsController);
+const commentsController = container.get(CommentsController);
 
 postRouter.get('/',
     PostQueryPageNumberValidation,

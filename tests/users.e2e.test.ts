@@ -42,7 +42,7 @@ describe('USERS_TESTS', () => {
         const newUser = await request(app)
             .post(SETTINGS.PATH.USERS)
             .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
-            .send({ login: userDto.login, email: userDto.email, password: userDto.pass })
+            .send({ login: userDto.login, email: userDto.email, password: userDto.password })
             .expect(201);
 
         expect(newUser.body).toEqual({

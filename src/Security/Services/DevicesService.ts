@@ -1,17 +1,22 @@
 import {UsersRepo} from "../../Repositories/UsersRepo";
 import {CustomError, ForbiddenError, HttpStatuses, NotFoundError} from "../../helpers/ErrorHandler";
-import {jwtService} from "../../Auth/Services/JwtService";
+import {JwtService} from "../../Auth/Services/JwtService";
 import {DevicesRepo} from "../Repositories/DevicesRepo";
 import {ObjectId} from "mongodb";
-import {DevicesQRepo} from "../Repositories/DevicesQRepo";
 import {devicesCollection} from "../../db/mongoDB";
+import {injectable} from "inversify";
 
-export const devicesServices = {
+@injectable()
+export class DevicesServices {
+    constructor(protected jwtService: JwtService,
+                protected devicesRepo: DevicesRepo,
+                protected usersRepo: UsersRepo,) {}
+
     async deleteDevice(deviceId: string, RToken: string): Promise<void> {
-        const payload = await jwtService.verifyRToken(RToken)
+        const payload = await this.jwtService.verifyRToken(RToken)
 
         const _id = new ObjectId(deviceId)
-        const foundDevice = await DevicesRepo.ShowDevice(_id)
+        const foundDevice = await this.devicesRepo.ShowDevice(_id)
 
         if (!foundDevice) {
             throw new NotFoundError('No device found');
@@ -20,17 +25,17 @@ export const devicesServices = {
         if (foundDevice.userId!==payload.userId)
         {throw new ForbiddenError("Data to be modified not yours");}
 
-        await DevicesRepo.DeleteDevice(deviceId)
+        await this.devicesRepo.DeleteDevice(deviceId)
 
-    },
+    }
 
     async deleteAllDevices(userId: ObjectId, iat: number) {
-        const user = await UsersRepo.ShowUser(userId.toString())
+        const user = await this.usersRepo.ShowUser(userId.toString())
         if (!user) {
             throw new NotFoundError('Wrong User Id')
         }
 
-        const res = await DevicesRepo.DeleteAllDevices(userId, iat)
+        const res = await this.devicesRepo.DeleteAllDevices(userId, iat)
         if (!res) {
             throw new CustomError('Unexpected exception', HttpStatuses.ServerError, [{
                 message: 'No delete happened in repo',
@@ -39,3 +44,5 @@ export const devicesServices = {
         }
     }
 }
+
+

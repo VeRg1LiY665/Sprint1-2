@@ -1,10 +1,13 @@
 import {Router} from "express";
-import {commentsController} from "./CommentsController";
+import {CommentsController} from "./CommentsController";
 import {accessTokenGuard} from "../../Auth/guards/AccesTokenGuard";
 import {CommentContentValidation, IDValidationMiddleware} from "./CommentsMiddlewares";
 import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
+import {container} from "../../composition-root";
 
 export const commentsRouter = Router();
+const commentsController = container.get(CommentsController);
+
 
 commentsRouter.get('/:id',
     IDValidationMiddleware,

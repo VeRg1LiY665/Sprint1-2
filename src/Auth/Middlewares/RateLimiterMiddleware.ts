@@ -1,6 +1,7 @@
 import {Request, Response, NextFunction} from "express";
 import {RequestsRepo} from "../../Security/Repositories/RequestsRepo";
 import {ObjectId} from "mongodb";
+import {container} from "../../composition-root";
 
 export const rateLimiter = async (req:Request, res:Response, next:NextFunction) => {
     //TODO спросить про redis
@@ -18,9 +19,10 @@ export const rateLimiter = async (req:Request, res:Response, next:NextFunction) 
 
     const DateToSearch = new Date(RequestToApi.date.getTime()-TimeLimit) // convert date -> ms, subtract 10 sec in ms, convert ms->date
 
+    const requestsRepo = container.get(RequestsRepo)
 
-    await RequestsRepo.AddRequest(RequestToApi)
-    const requests = await RequestsRepo.CountRequests({ip: RequestToApi.ip, URL: RequestToApi.URL, DateToSearch:DateToSearch})
+    await requestsRepo.AddRequest(RequestToApi)
+    const requests = await requestsRepo.CountRequests({ip: RequestToApi.ip, URL: RequestToApi.URL, DateToSearch:DateToSearch})
 
     if (requests > ReqLimit) {
         res.status(429).json({ message: 'Too many requests, try again later.' });

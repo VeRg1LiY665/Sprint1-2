@@ -1,4 +1,4 @@
-import {ioc} from "../../composition-root";
+import {container} from "../../composition-root";
 import {
     BlogDescriptionValidation,
     BlogNameValidation,
@@ -22,7 +22,8 @@ import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
 import {BlogsController} from "./BlogsController";
 
 export const blogRouter = Router();
-const blogsController = ioc.getInstance<BlogsController>(BlogsController);
+const blogsController = container.get(BlogsController);
+
 blogRouter.get('/',
     BlogQueryPageNumberValidation,
     BlogQueryPageSizeValidation,

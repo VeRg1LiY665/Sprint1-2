@@ -2,7 +2,9 @@ import {InputPostType} from "../IO Types/InputPostType";
 import {postsCollection} from "../db/mongoDB";
 import {ObjectId} from "mongodb";
 import {PostDBType} from "../Data Types/PostDBType";
+import {injectable} from "inversify";
 
+@injectable()
 export class PostsRepo {
     async ShowPostByID(id:string) {
         const post = await postsCollection.findOne({_id: new ObjectId(id)})
