@@ -34,14 +34,14 @@ export class AuthServices {
             const refreshToken= await this.jwtService.createRToken(foundUser._id ,deviceId)
 
             const  RPayload = await this.jwtService.decodeRToken(refreshToken)
-            const device = {
-                ip: content.ip,
-                title: content.title,
-                iat: RPayload.iat,
-                exp: RPayload.exp,
-                _id: RPayload.deviceId,
-                userId: RPayload.userId
-            }
+            const device = new DeviceDBType(
+                RPayload.deviceId,
+                RPayload.userId,
+                content.ip,
+                content.title,
+                RPayload.iat,
+                RPayload.exp
+            )
 
             const res = await this.devicesRepo.AddDevice(device)
             if (!res) {throw new CustomError('Unexpected error',

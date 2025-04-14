@@ -7,15 +7,21 @@ import {CommentDBType} from "../Data Types/CommentDBType";
 import {DeviceDBType} from "../Data Types/DeviceDBType";
 import {ReqDBType} from "../Data Types/ReqDBType";
 import mongoose from "mongoose";
+import {blogsSchema} from "../Schemas/blogsSchema";
+import {postsSchema} from "../Schemas/postsSchema";
 
 
-export let postsCollection: Collection<PostDBType>
+/*export let postsCollection: Collection<PostDBType>
 export let blogsCollection: Collection<BlogDBType>
 export let usersCollection: Collection<UserDBType>
 export let commentsCollection: Collection<CommentDBType>
 export let devicesCollection: Collection<DeviceDBType>
 export let requestsCollection:Collection<ReqDBType>
-export let likesCollection:Collection
+export let likesCollection:Collection*/
+
+export const BlogModel = mongoose.model("blogs", blogsSchema);
+export const PostModel = mongoose.model("posts", postsSchema);
+
 
 export const db = {
     client: {} as MongoClient,
@@ -39,7 +45,7 @@ export const db = {
             likesCollection = db.collection(SETTINGS.PATH.LIKES);*/
 
             //await this.client.connect();  //connect to db with mongo driver
-            await mongoose.connect(url);  //connect to db with mongoose
+            await mongoose.connect(url + SETTINGS.DB_NAME);  //connect to db with mongoose
 
             await this.getDbName().command({ ping: 1 });
             console.log('Connected successfully to mongo server');

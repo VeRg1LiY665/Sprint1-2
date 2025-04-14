@@ -1,4 +1,4 @@
-import {blogsCollection} from "../db/mongoDB";
+import {BlogModel} from "../db/mongoDB";
 import {ObjectId} from "mongodb";
 import {BlogDBType} from "../Data Types/BlogDBType";
 import {BlogOutputType} from "../IO Types/BlogOutputType";
@@ -17,19 +17,19 @@ export class BlogsQRepo {
         let filter:any={};
 
         if(dto.searchNameTerm) {filter.name = {$regex:dto.searchNameTerm, $options: 'i'}}
-        const AllBlogs = await blogsCollection
+        const AllBlogs = await BlogModel
             .find(filter)
-            .sort(dto.sortBy, dto.sortDirection===1 ? 1 :-1)
+            .sort({[dto.sortBy] : dto.sortDirection===1 ? 1 :-1})  //TODO проверить работу сорта
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
-            .toArray();
+            //.toArray();
 
         return AllBlogs.map(el=> (this.mapToOutput(el)))
     }
 
     async ShowBlogByID(id: string):Promise<BlogOutputType | null> {
         const _id = new ObjectId(id)
-        const blog = await blogsCollection.findOne({_id: _id});
+        const blog = await BlogModel.findOne({_id: _id});
         if (!blog) {
             return null
         }
@@ -39,7 +39,7 @@ export class BlogsQRepo {
     async BlogsCounter(searchNameTerm:string|null):Promise<number>{
         let filter:any={};
         if(searchNameTerm!==null) {filter.name = {$regex:searchNameTerm, $options: 'i'}}
-        return await blogsCollection.countDocuments(filter)
+        return await BlogModel.countDocuments(filter)
     }
 
     mapToOutput(blog: BlogDBType): BlogOutputType {

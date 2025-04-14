@@ -1,5 +1,5 @@
 import {InputBlogType} from "../IO Types/InputBlogType";
-import {blogsCollection, postsCollection} from "../db/mongoDB";
+import {BlogModel, PostModel} from "../db/mongoDB";
 import {ObjectId} from "mongodb";
 import {BlogDBType} from "../Data Types/BlogDBType";
 import {injectable} from "inversify";
@@ -8,7 +8,7 @@ import {injectable} from "inversify";
 export class BlogsRepo {
     async ShowBlogByID (id:string) {
         const _id = new ObjectId(id)
-        const blog = await blogsCollection.findOne({_id: _id});
+        const blog = await BlogModel.findOne({_id: _id});
         if (blog===null) {
             return null
         }
@@ -16,22 +16,22 @@ export class BlogsRepo {
     }
 
     async DeleteBlog (id:string) {
-        const res = await blogsCollection.deleteOne({_id : new ObjectId(id)})
+        const res = await BlogModel.deleteOne({_id : new ObjectId(id)})
         return res.deletedCount === 1;
     }
 
     async SetUpNewBlog(blog:BlogDBType) {
 
-        const res = await blogsCollection.insertOne(blog)
+        const res = await BlogModel.insertOne(blog)
         return res.insertedId.toString();
     }
     async ChangeBlog (id: string, content:InputBlogType) {
 
-        const res = await blogsCollection.updateOne(
+        const res = await BlogModel.updateOne(
             {_id: new ObjectId(id)},
             {$set:{...content}}
         )
-        await postsCollection.updateMany(
+        await PostModel.updateMany(
             {blogId:id},
             {$set:{blogName:content.name}}
         )
