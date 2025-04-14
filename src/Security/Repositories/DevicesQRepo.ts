@@ -1,13 +1,13 @@
 import {DevicesOutputType} from "../../IO Types/DevicesOutputType";
 import {DeviceDBType} from "../../Data Types/DeviceDBType";
-import {devicesCollection} from "../../db/mongoDB";
+import {DeviceModel} from "../../db/mongoDB";
 import {ObjectId} from "mongodb";
 
 export class DevicesQRepo {
     async showAllDevices(userId:ObjectId): Promise<DevicesOutputType[]> {
-        const AllDevices = await devicesCollection
+        const AllDevices = await DeviceModel
             .find({userId})
-            .toArray();
+
 
         return AllDevices.map(el => (this.mapToOutput(el)))
     }

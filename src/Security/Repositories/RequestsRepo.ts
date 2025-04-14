@@ -1,11 +1,11 @@
 import {ReqDBType} from "../../Data Types/ReqDBType";
-import {requestsCollection} from "../../db/mongoDB";
+import {ReqModel} from "../../db/mongoDB";
 import {injectable} from "inversify";
 
 @injectable()
 export class RequestsRepo {
     async CountRequests(content: {ip:string, URL: string, DateToSearch:Date}): Promise<number> {
-        const res = await requestsCollection.countDocuments(
+        const res = await ReqModel.countDocuments(
             {$and:[
                     {ip : content.ip},
                     {URL:content.URL},
@@ -17,11 +17,11 @@ export class RequestsRepo {
     }
 
     async AddRequest(content:ReqDBType):Promise<void> {
-        await requestsCollection.insertOne(content);
+        await ReqModel.insertOne(content);
     }
 
     async DeleteRequestsForIpAndURL(content: Partial <ReqDBType>):Promise<void> { //почистить базу после срабатывания лимитера
-        const res = await requestsCollection.deleteMany({$and:[{ip : content.ip}, {URL:content.URL}]});
+        const res = await ReqModel.deleteMany({$and:[{ip : content.ip}, {URL:content.URL}]});
     }
 }
 

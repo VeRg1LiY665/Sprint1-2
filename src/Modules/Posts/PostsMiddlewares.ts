@@ -1,6 +1,6 @@
 import {body, query, validationResult} from "express-validator";
 import {Request,Response, NextFunction} from "express";
-import {blogsCollection} from "../../db/mongoDB";
+import {BlogModel} from "../../db/mongoDB";
 import mongoose from "mongoose";
 import {ObjectId} from "mongodb";
 
@@ -45,7 +45,7 @@ export const PostQuerySortDirectionValidation =query('sortDirection').optional()
 
 export const BlogIdValidationMiddleware = async (req:Request, res: Response, next:NextFunction) => {
     if (!mongoose.isValidObjectId(req.body.blogId))
-    {    if (!await blogsCollection.findOne({_id : new ObjectId(req.body.blogId)}))
+    {    if (!await BlogModel.findOne({_id : new ObjectId(req.body.blogId)}))
     {res.status(400).json('BlodId is incorrect');return}
       else  {next()}
     }

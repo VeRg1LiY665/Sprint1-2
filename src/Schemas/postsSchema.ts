@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import {ObjectId} from "mongodb";
+import {PostDBType} from "../Data Types/PostDBType";
 
-export const postsSchema = new mongoose.Schema({
+export const postsSchema = new mongoose.Schema<PostDBType>({
     _id: ObjectId,
     title: String,
     shortDescription: String,

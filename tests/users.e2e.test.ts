@@ -15,7 +15,7 @@ describe('USERS_TESTS', () => {
     });
 
     beforeEach(async () => {
-        await db.drop();
+        await db.drop(await MongoMemoryServer.getUri());   //TODO как-то нужно передать connection string, чтобы дропнуть бд
     });
 
     afterAll(async () => {

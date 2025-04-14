@@ -5,7 +5,7 @@ import {db} from "./db/mongoDB";
 
 export const startApp = async () => {
 
-    const res = await db.runDB(SETTINGS.MONGO_URL)
+    const res = await db.runDB(SETTINGS.MONGO_URL + SETTINGS.DB_NAME);
     if (!res) {
         process.exit(1);
     }

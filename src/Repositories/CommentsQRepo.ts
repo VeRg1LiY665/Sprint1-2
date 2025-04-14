@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {blogsCollection, commentsCollection} from "../db/mongoDB";
+import {BlogModel, CommentModel} from "../db/mongoDB";
 import {CommentOutputType} from "../IO Types/CommentOutputType";
 import {CommentDBType} from "../Data Types/CommentDBType";
 import {injectable} from "inversify";
@@ -15,12 +15,11 @@ export class CommentsQRepo{
 
         const _postID = new ObjectId(dto.postId)
 
-        const comments = await commentsCollection
+        const comments = await CommentModel
             .find({postID: _postID})
-            .sort(dto.sortBy, dto.sortDirection===1 ? 1 :-1)
+            .sort({[dto.sortBy] : dto.sortDirection===1 ? 1 :-1})
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
-            .toArray();
 
         if (comments.length === 0) {}
         return comments.map(el=> (this.mapToOutput(el)))
@@ -28,7 +27,7 @@ export class CommentsQRepo{
 
     async ShowCommentByID(id: string):Promise<CommentOutputType | null> {
         const _id = new ObjectId(id)
-        const comment = await commentsCollection.findOne({_id: _id});
+        const comment = await CommentModel.findOne({_id: _id});
         if (comment===null) {
             return null
         }
@@ -38,7 +37,7 @@ export class CommentsQRepo{
     async CommentsCounter(postId:string):Promise<number>{
         let filter:any={postID : new ObjectId(postId)};
 
-        return await commentsCollection.countDocuments(filter)
+        return await CommentModel.countDocuments(filter)
     }
 
     mapToOutput(comment: CommentDBType): CommentOutputType {

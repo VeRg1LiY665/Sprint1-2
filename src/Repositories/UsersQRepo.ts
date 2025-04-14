@@ -1,5 +1,5 @@
 import {UserOutputType} from "../IO Types/UserOutputType";
-import {usersCollection} from "../db/mongoDB";
+import {UserModel} from "../db/mongoDB";
 import {UserDBType} from "../Data Types/UserDBType";
 import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
@@ -23,18 +23,18 @@ export class UsersQRepo{
             $or.push({email: {$regex: dto.searchEmailTerm, $options: 'i'}})
         }
 
-        const AllUsers = await usersCollection
+        const AllUsers = await UserModel
             .find(($or.length>0) ? {$or:$or} : {})
-            .sort(dto.sortBy, dto.sortDirection === 1 ? 1 : -1)
+            .sort({[dto.sortBy] : dto.sortDirection === 1 ? 1 : -1})
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
-            .toArray();
+
         return AllUsers.map(el => (this.mapToOutput(el)))
     }
 
     async ShowUserByID(userId: string) {
         const _id = new ObjectId(userId)
-        const user=  await usersCollection.findOne({_id:_id})
+        const user=  await UserModel.findOne({_id:_id})
         if(!user){
             return null
         }
@@ -49,7 +49,7 @@ export class UsersQRepo{
         if (searchEmailTerm) {
             $or.push({email: {$regex: searchEmailTerm, $options: 'i'}})
         }
-        return await usersCollection.countDocuments(($or.length>0) ? {$or:$or} : {})
+        return await UserModel.countDocuments(($or.length>0) ? {$or:$or} : {})
     }
 
     mapToOutput(user: UserDBType): UserOutputType {

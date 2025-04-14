@@ -5,12 +5,12 @@ import {SETTINGS} from "./settings";
 import {blogRouter} from "./Modules/Blogs/BlogsRouters";
 import {postRouter} from "./Modules/Posts/PostsRouters";
 import {
-    blogsCollection,
-    commentsCollection,
-    devicesCollection,
-    postsCollection,
-    requestsCollection,
-    usersCollection
+    BlogModel,
+    CommentModel,
+    DeviceModel,
+    PostModel,
+    ReqModel,
+    UserModel
 } from "./db/mongoDB";
 import {authRouter} from "./Auth/AuthRouter";
 import {usersRouter} from "./Modules/Users/UsersRouters";
@@ -30,12 +30,12 @@ app.get('/', (req, res) => {
 })
 
 app.delete('/testing/all-data', async (req: Request, res: Response) => {
-    await postsCollection.drop();
-    await blogsCollection.drop();
-    await usersCollection.drop();
-    await commentsCollection.drop();
-    await devicesCollection.drop();
-    await requestsCollection.drop();
+    await BlogModel.collection.drop();
+    await PostModel.collection.drop();
+    await UserModel.collection.drop();
+    await CommentModel.collection.drop();
+    await DeviceModel.collection.drop()
+    await ReqModel.collection.drop();
     res.status(204).json('All data is deleted')
 })
 

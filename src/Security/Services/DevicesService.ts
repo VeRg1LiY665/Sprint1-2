@@ -3,7 +3,6 @@ import {CustomError, ForbiddenError, HttpStatuses, NotFoundError} from "../../he
 import {JwtService} from "../../Auth/Services/JwtService";
 import {DevicesRepo} from "../Repositories/DevicesRepo";
 import {ObjectId} from "mongodb";
-import {devicesCollection} from "../../db/mongoDB";
 import {injectable} from "inversify";
 
 @injectable()

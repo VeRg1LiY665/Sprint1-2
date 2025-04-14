@@ -1,4 +1,4 @@
-import {postsCollection} from "../db/mongoDB";
+import {PostModel} from "../db/mongoDB";
 import {ObjectId} from "mongodb";
 import {PostDBType} from "../Data Types/PostDBType";
 import {PostOutputType} from "../IO Types/PostOutputType";
@@ -18,17 +18,16 @@ export class PostsQRepo {
 
         if(dto.searchNameTerm) {filter.title = {$regex:dto.searchNameTerm, $options: 'i'}}
 
-        const allPosts = await (postsCollection
+        const allPosts = await PostModel
             .find(filter)
-            .sort(dto.sortBy, dto.sortDirection===1 ? 1 :-1)
+            .sort({[dto.sortBy] : dto.sortDirection===1 ? 1 :-1})
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
-            .toArray())
         return allPosts.map(el=> (this.mapToOutput(el)))
     }
 
     async ShowPostByID(id: string) {
-        const post = await postsCollection.findOne({_id: new ObjectId(id)})
+        const post = await PostModel.findOne({_id: new ObjectId(id)})
         if (post===null) {
             return null
         }
@@ -47,12 +46,11 @@ export class PostsQRepo {
 
         if(dto.searchNameTerm) {filter.title = {$regex:dto.searchNameTerm, $options: 'i'}}
 
-        const posts = await postsCollection
+        const posts = await PostModel
             .find(filter)
-            .sort(dto.sortBy, dto.sortDirection===1 ? 1 :-1)
+            .sort({[dto.sortBy] : dto.sortDirection===1 ? 1 :-1})
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
-            .toArray()
 
         if (!posts) {
             return null
@@ -64,7 +62,7 @@ export class PostsQRepo {
         let filter:any={};
         if(searchNameTerm) {filter.title = {regex:searchNameTerm, options: 'i'}}
         if(blogId) {filter.blogId = blogId}
-        return await postsCollection.countDocuments(filter)
+        return await PostModel.countDocuments(filter)
     }
 
     mapToOutput(post: PostDBType): PostOutputType {

@@ -1,5 +1,5 @@
 import {UserDBType} from "../Data Types/UserDBType";
-import {usersCollection} from "../db/mongoDB";
+import {UserModel} from "../db/mongoDB";
 import {ObjectId} from "mongodb";
 import mongoose from "mongoose";
 import {injectable} from "inversify";
@@ -21,7 +21,7 @@ export class UsersRepo {
             default: filter.login = searchData
         }
 
-        const user:UserDBType | null =  await usersCollection.findOne(filter)
+        const user:UserDBType | null =  await UserModel.findOne(filter)
 
         if(!user){
             return null
@@ -30,12 +30,12 @@ export class UsersRepo {
     }
 
     async SetUpNewUser(user: UserDBType): Promise<string> {
-        const res = await usersCollection.insertOne(user)
-        return res.insertedId.toString();
+        const res = await UserModel.insertOne(user)
+        return res._id.toString();
     }
 
     async UpdateUser(user: UserDBType): Promise<boolean> {
-        const res = await usersCollection.updateOne(
+        const res = await UserModel.updateOne(
             {_id: user._id},
             {$set:{...user}}
         )
@@ -43,7 +43,7 @@ export class UsersRepo {
     }
 
     async DeleteUser(id: string): Promise<boolean> {
-        try {const res = await usersCollection.deleteOne({_id : new ObjectId(id)})
+        try {const res = await UserModel.deleteOne({_id : new ObjectId(id)})
             return res.deletedCount === 1;}
         catch (e) { console.error(e) }
         return false

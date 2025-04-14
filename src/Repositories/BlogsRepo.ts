@@ -23,7 +23,7 @@ export class BlogsRepo {
     async SetUpNewBlog(blog:BlogDBType) {
 
         const res = await BlogModel.insertOne(blog)
-        return res.insertedId.toString();
+        return res._id.toString();
     }
     async ChangeBlog (id: string, content:InputBlogType) {
 

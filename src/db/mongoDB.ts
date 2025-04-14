@@ -1,86 +1,57 @@
-import {Collection, Db, MongoClient} from "mongodb";
-import {PostDBType} from "../Data Types/PostDBType";
-import {BlogDBType} from "../Data Types/BlogDBType";
 import {SETTINGS} from "../settings";
-import {UserDBType} from "../Data Types/UserDBType";
-import {CommentDBType} from "../Data Types/CommentDBType";
-import {DeviceDBType} from "../Data Types/DeviceDBType";
-import {ReqDBType} from "../Data Types/ReqDBType";
 import mongoose from "mongoose";
 import {blogsSchema} from "../Schemas/blogsSchema";
 import {postsSchema} from "../Schemas/postsSchema";
+import {commentsSchema} from "../Schemas/commentsSchema";
+import {usersSchema} from "../Schemas/usersSchema";
+import {devicesSchema} from "../Schemas/deviceSchema";
+import {requestsSchema} from "../Schemas/requestSchema";
 
 
-/*export let postsCollection: Collection<PostDBType>
-export let blogsCollection: Collection<BlogDBType>
-export let usersCollection: Collection<UserDBType>
-export let commentsCollection: Collection<CommentDBType>
-export let devicesCollection: Collection<DeviceDBType>
-export let requestsCollection:Collection<ReqDBType>
-export let likesCollection:Collection*/
 
 export const BlogModel = mongoose.model("blogs", blogsSchema);
 export const PostModel = mongoose.model("posts", postsSchema);
+export const CommentModel = mongoose.model("comments", commentsSchema);
+export const UserModel = mongoose.model("users", usersSchema);
+export const DeviceModel = mongoose.model("devices", devicesSchema);
+export const ReqModel = mongoose.model("requests", requestsSchema);
 
 
 export const db = {
-    client: {} as MongoClient,
-
-    getDbName(): Db {
-        return this.client.db(SETTINGS.DB_NAME);
-    },
 
     async runDB(url: string): Promise<boolean> {
 
         try {
-          /*  this.client = new MongoClient(url);
-            let db = this.client.db(SETTINGS.DB_NAME)
+            await mongoose.connect(url);  //connect to db with mongoose
 
-            blogsCollection = db.collection<BlogDBType>(SETTINGS.PATH.BLOGS);
-            postsCollection = db.collection<PostDBType>(SETTINGS.PATH.POSTS);
-            usersCollection = db.collection<UserDBType>(SETTINGS.PATH.USERS);
-            commentsCollection = db.collection<CommentDBType>(SETTINGS.PATH.COMMENTS);
-            devicesCollection = db.collection<DeviceDBType>(SETTINGS.PATH.DEVICES);
-            requestsCollection = db.collection<ReqDBType>(SETTINGS.PATH.REQUESTS);
-            likesCollection = db.collection(SETTINGS.PATH.LIKES);*/
-
-            //await this.client.connect();  //connect to db with mongo driver
-            await mongoose.connect(url + SETTINGS.DB_NAME);  //connect to db with mongoose
-
-            await this.getDbName().command({ ping: 1 });
-            console.log('Connected successfully to mongo server');
+            if (mongoose.connection.readyState === 1)
+            {console.log('Connected successfully to mongo server');}
             return true;
+
         } catch (e: unknown) {
             console.error("Can't connect to mongo server", e);
-           // await this.client.close();
+
             await mongoose.disconnect();
             return false;
         }
     },
 
     async stop() {
-        await this.client.close();
+        await mongoose.disconnect();
         console.log('Connection successful closed');
     },
 
-    async drop() {
+    async drop(url:string) {
         try {
-            await this.getDbName().dropDatabase()
+            await mongoose.connect(url);
+                await mongoose.connection.db!.dropDatabase();  //даже с проверкой все равно ts ругается на possibly undefined
+                console.log('db dropped successfully')
+
 
         } catch (e: unknown) {
             console.error('Error in drop db:', e);
-            await this.stop();
+            await mongoose.disconnect();
         }
     },
-    getCollections() {
-        return {
-            usersCollection:  this.getDbName().collection('users'),
-            blogsCollection:  this.getDbName().collection('blogs'),
-            postsCollection:  this.getDbName().collection('posts'),
-            commentsCollection:  this.getDbName().collection('comments'),
-            devicesCollection:  this.getDbName().collection('devices'),
-            requestsCollection:  this.getDbName().collection('requests'),
-            likesCollection:  this.getDbName().collection('likes'),
-        };
-    },
+
 }
