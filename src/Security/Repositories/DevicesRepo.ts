@@ -7,7 +7,7 @@ export class DevicesRepo  {
         let filter: any = {};
         filter._id = _id//.toString();  //какого собственно хрена это работает?
 
-        const device:DeviceDBType | null =  await DeviceModel.findOne(filter)
+        const device:DeviceDBType | null =  await DeviceModel.findOne(filter).lean()  //TODO Fast&dirty solution - implement lean at EVERY place where we find an element of collection
 
         if(!device){
             return null
