@@ -2,20 +2,22 @@ import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { createUser } from './utils/createUsers';
 import { testingDtosCreator } from './utils/testingDtosCreator';
-import {db} from "../src/db/mongoDB";
+import {DB} from "../src/db/mongoDB";
 import {app} from "../src/app";
 import {SETTINGS} from "../src/settings";
 
 describe('USERS_TESTS', () => {
-    //const app = startApp();
+
+    let db:any
 
     beforeAll(async () => {
         const mongoServer = await MongoMemoryServer.create();
-        await db.runDB(mongoServer.getUri());
+        db = new DB(mongoServer.getUri())
+        await db.runDB();
     });
 
     beforeEach(async () => {
-        await db.drop(await MongoMemoryServer.getUri());   //TODO как-то нужно передать connection string, чтобы дропнуть бд
+        await db.drop();   //TODO как-то нужно передать connection string, чтобы дропнуть бд
     });
 
     afterAll(async () => {

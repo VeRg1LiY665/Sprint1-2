@@ -78,7 +78,7 @@ export class AuthServices {
 
             const newRPayload:RefreshTokenPayloadType = await this.jwtService.decodeRToken(newRToken)
             const UpdDevice:DeviceDBType = {...foundDevice, iat:newRPayload.iat, exp:newRPayload.exp};
-
+            console.log(UpdDevice)
             const res = await this.devicesRepo.UpdateDevice(UpdDevice)
             if (!res)
             {throw new NotFoundError('Device not found in repo')} //чтобы проверить работу фильтра при апдейте

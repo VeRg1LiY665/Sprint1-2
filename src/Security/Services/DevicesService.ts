@@ -21,7 +21,7 @@ export class DevicesServices {
             throw new NotFoundError('No device found');
         }
 
-        if (foundDevice.userId!==payload.userId)
+        if (foundDevice.userId.toString()!==payload.userId.toString())  //НИКОГДА В БУДУЩЕМ не передавать ObjectId, бросать стринги
         {throw new ForbiddenError("Data to be modified not yours");}
 
         await this.devicesRepo.DeleteDevice(deviceId)

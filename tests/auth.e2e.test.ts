@@ -1,5 +1,5 @@
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {db} from "../src/db/mongoDB";
+import {DB} from "../src/db/mongoDB";
 import {SETTINGS} from "../src/settings";
 import request from "supertest";
 import {app} from "../src/app";
@@ -7,9 +7,13 @@ import {createUser, createUsers} from "./utils/createUsers";
 import {delay} from "./test-helpers";
 
 describe('AUTH_TESTS', () => {
+
+    let db:any
+
     beforeAll(async () => {
         const mongoServer = await MongoMemoryServer.create();
-        await db.runDB(mongoServer.getUri());
+        db = new DB(mongoServer.getUri());
+        await db.runDB();
         //await db.drop();
     });
 

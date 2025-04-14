@@ -5,7 +5,7 @@ import {ObjectId} from "mongodb";
 export class DevicesRepo  {
     async ShowDevice(_id: ObjectId): Promise<DeviceDBType | null >{
         let filter: any = {};
-        filter._id = _id.toString();  //какого собственно хрена это работает?
+        filter._id = _id//.toString();  //какого собственно хрена это работает?
 
         const device:DeviceDBType | null =  await DeviceModel.findOne(filter)
 
@@ -21,6 +21,7 @@ export class DevicesRepo  {
     }
 
     async UpdateDevice(device:DeviceDBType): Promise<boolean> {
+
         let filter: any = {};
         filter._id = device._id.toString();
         const res = await DeviceModel.updateOne(
@@ -33,7 +34,7 @@ export class DevicesRepo  {
 
     async DeleteDevice(deviceId: string): Promise<boolean> {
         let filter: any = {};
-        filter._id = deviceId//.toString(); //и опять же - какого собственно хрена это работает?
+        filter._id = deviceId.toString(); //и опять же - какого собственно хрена это работает?
         const res = await DeviceModel.deleteOne(filter);
 
         return res.deletedCount === 1

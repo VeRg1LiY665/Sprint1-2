@@ -1,11 +1,13 @@
 import {app} from './app'
 import {SETTINGS} from './settings'
-import {db} from "./db/mongoDB";
+import {DB} from "./db/mongoDB";
 
 
 export const startApp = async () => {
 
-    const res = await db.runDB(SETTINGS.MONGO_URL + SETTINGS.DB_NAME);
+    const db = new DB(SETTINGS.MONGO_URL + SETTINGS.DB_NAME)
+
+    const res = await db.runDB();
     if (!res) {
         process.exit(1);
     }
