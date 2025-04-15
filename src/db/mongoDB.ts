@@ -5,6 +5,7 @@ import {commentsSchema} from "../Schemas/commentsSchema";
 import {usersSchema} from "../Schemas/usersSchema";
 import {devicesSchema} from "../Schemas/deviceSchema";
 import {requestsSchema} from "../Schemas/requestSchema";
+import {likesSchema} from "../Schemas/likesSchema";
 
 
 
@@ -14,6 +15,7 @@ export const CommentModel = mongoose.model("comments", commentsSchema);
 export const UserModel = mongoose.model("users", usersSchema);
 export const DeviceModel = mongoose.model("devices", devicesSchema);
 export const ReqModel = mongoose.model("requests", requestsSchema);
+export const LikesModel = mongoose.model("likes", likesSchema);
 
 export class DB {
 

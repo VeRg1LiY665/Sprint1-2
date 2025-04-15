@@ -1,5 +1,4 @@
-import {inject, injectable} from "inversify";
-
+import {injectable} from "inversify";
 import {InputBlogType} from "../IO Types/InputBlogType";
 import {ObjectId} from "mongodb";
 import {BlogsRepo} from "../Repositories/BlogsRepo";

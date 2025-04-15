@@ -24,3 +24,4 @@ commentsRouter.put('/:id',
     CommentContentValidation,
     ErrorCollectionMiddleware,
     commentsController.updateComment.bind(commentsController))
+
