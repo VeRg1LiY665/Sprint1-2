@@ -1,4 +1,6 @@
 import {InputBlogType} from "../../src/IO Types/InputBlogType";
+import {InputPostType} from "../../src/IO Types/InputPostType";
+import {InputCommentType} from "../../src/IO Types/InputCommentType";
 
 export type UserDto = {
     login: string
@@ -32,25 +34,54 @@ export const testingDtosCreator = {
     },
 
     createBlogDto(content: Partial<InputBlogType>): InputBlogType {
-        return {
-            name: content.name ?? 'test',
-            description: content.description ?? 'description example',
-            websiteUrl: content.websiteUrl ?? 'www.example.com',
-
-        }
+        return new InputBlogType(
+            content.name ?? 'test',
+            content.description ?? 'description example',
+            content.websiteUrl ?? 'https://www.example.com',
+    )
     },
 
     createBlogDtos(count:number): InputBlogType[] {
         const blogs =[]
 
         for (let i = 0; i <= count; i++) {
-            blogs.push({
-                name: `testname${i}`,
-                description: `description example for test blog №${i}`,
-                websiteUrl: `www.example${i}.com`,
-
-            })
+            blogs.push(new InputBlogType(
+                `testname${i}`,
+                `description example for test blog №${i}`,
+               `www.example${i}.com`,
+                )
+            )
         }
         return blogs
-    }
+    },
+
+    createPostDto(content: Partial<InputPostType>): InputPostType {
+        return new InputPostType(
+            content.title ?? 'test',
+            content.shortDescription ?? 'description example',
+            content.content ?? 'example content',
+            content.blogId ?? '',
+        )
+    },
+
+    createPostDtos(count:number, blogId:string): InputPostType[] {
+        const posts =[]
+
+        for (let i = 0; i <= count; i++) {
+            posts.push(new InputPostType(
+                    `testTitle${i}`,
+                    `description example for test post №${i}`,
+                    `example content${i} for test post ${i}`,
+                    blogId
+                )
+            )
+        }
+        return posts
+    },
+
+    createCommentDto(content: Partial<InputCommentType>): InputCommentType {
+        return new InputCommentType(
+            content.content ?? 'example content for comment',
+        )
+    },
 }

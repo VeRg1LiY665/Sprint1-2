@@ -7,7 +7,7 @@ import {injectable} from "inversify";
 @injectable()
 export class PostsRepo {
     async ShowPostByID(id:string) {
-        const post = await PostModel.findOne({_id: new ObjectId(id)})
+        const post = await PostModel.findOne({_id: new ObjectId(id)}).lean()
         if (!post) {
             return null;
         }

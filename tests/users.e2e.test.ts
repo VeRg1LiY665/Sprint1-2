@@ -17,7 +17,7 @@ describe('USERS_TESTS', () => {
     });
 
     beforeEach(async () => {
-        await db.drop();   //TODO как-то нужно передать connection string, чтобы дропнуть бд
+        await db.drop();
     });
 
     afterAll(async () => {

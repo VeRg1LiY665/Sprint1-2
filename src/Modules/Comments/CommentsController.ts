@@ -27,20 +27,20 @@ export class CommentsController {
     const foundPost = await this.postsQRepo.ShowPostByID(req.params.id);
     if (foundPost===null) {throw new NotFoundError('Post not found')}
 
-const {pageNumber, pageSize, sortBy, sortDirection, postId} = commentsPaginationQueries(req)
+    const {pageNumber, pageSize, sortBy, sortDirection, postId} = commentsPaginationQueries(req)
 
-const comments = await this.commentsQRepo.ShowCommentsForPost({
-    pageNumber,
-    pageSize,
-    sortBy,
-    sortDirection,
-    postId
-})
-const commentsCount = await this.commentsQRepo.CommentsCounter(postId)
-const result = this.commentsQRepo.PaginationMap({pageNumber, pageSize, commentsCount, comments})
-res.status(200).json(result)
-}
-catch(err){next(err)}
+    const comments = await this.commentsQRepo.ShowCommentsForPost({
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortDirection,
+        postId
+    })
+    const commentsCount = await this.commentsQRepo.CommentsCounter(postId)
+    const result = this.commentsQRepo.PaginationMap({pageNumber, pageSize, commentsCount, comments})
+    res.status(200).json(result)
+    }
+    catch(err){next(err)}
 }
 
     async getCommentByID(req: Request, res: Response, next:NextFunction) {

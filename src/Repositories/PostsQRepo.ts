@@ -23,11 +23,12 @@ export class PostsQRepo {
             .sort({[dto.sortBy] : dto.sortDirection===1 ? 1 :-1})
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
+            .lean()
         return allPosts.map(el=> (this.mapToOutput(el)))
     }
 
     async ShowPostByID(id: string) {
-        const post = await PostModel.findOne({_id: new ObjectId(id)})
+        const post = await PostModel.findOne({_id: new ObjectId(id)}).lean()
         if (post===null) {
             return null
         }
@@ -68,6 +69,7 @@ export class PostsQRepo {
     mapToOutput(post: PostDBType): PostOutputType {
         let MappedPost:any = {id : (post._id).toString(), ...post}
         delete MappedPost._id
+        delete MappedPost.__v
         return MappedPost as PostOutputType
     }
 

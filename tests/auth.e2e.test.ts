@@ -14,12 +14,11 @@ describe('AUTH_TESTS', () => {
         const mongoServer = await MongoMemoryServer.create();
         db = new DB(mongoServer.getUri());
         await db.runDB();
-        //await db.drop();
     });
 
    /* beforeEach(async () => {
         await db.drop();
-    });*/
+    });*/   //TODO сделать тесты изолированными, если будет время
 
     afterAll(async () => {
         await db.stop();

@@ -1,3 +1,3 @@
-export type InputCommentType= {
-    content: string;
+export class InputCommentType {
+    constructor (public content: string){}
 }

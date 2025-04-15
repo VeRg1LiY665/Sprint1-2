@@ -21,7 +21,7 @@ export class UsersRepo {
             default: filter.login = searchData
         }
 
-        const user:UserDBType | null =  await UserModel.findOne(filter)
+        const user:UserDBType | null =  await UserModel.findOne(filter).lean()
 
         if(!user){
             return null

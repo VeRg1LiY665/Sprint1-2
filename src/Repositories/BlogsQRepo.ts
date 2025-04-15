@@ -19,10 +19,10 @@ export class BlogsQRepo {
         if(dto.searchNameTerm) {filter.name = {$regex:dto.searchNameTerm, $options: 'i'}}
         const AllBlogs = await BlogModel
             .find(filter)
-            .sort({[dto.sortBy] : dto.sortDirection===1 ? 1 :-1})  //TODO проверить работу сорта
+            .sort({[dto.sortBy] : dto.sortDirection===1 ? 1 :-1})
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
-            //.lean() // приводим к простому объекту
+            .lean() // приводим к простому объекту
             //.toArray();
 
         return AllBlogs.map(el=> (this.mapToOutput(el)))
@@ -30,7 +30,7 @@ export class BlogsQRepo {
 
     async ShowBlogByID(id: string):Promise<BlogOutputType | null> {
         const _id = new ObjectId(id)
-        const blog = await BlogModel.findOne({_id: _id});
+        const blog = await BlogModel.findOne({_id: _id}).lean();
         if (!blog) {
             return null
         }
@@ -46,6 +46,7 @@ export class BlogsQRepo {
     mapToOutput(blog: BlogDBType): BlogOutputType {
         let MappedBlog:any = {id : (blog._id).toString(), ...blog}
         delete MappedBlog._id
+        delete MappedBlog.__v
         return MappedBlog as BlogOutputType
     }
 

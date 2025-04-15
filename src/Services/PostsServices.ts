@@ -4,8 +4,7 @@ import {ObjectId} from "mongodb";
 import {PostsRepo} from "../Repositories/PostsRepo";
 import {PostDBType} from "../Data Types/PostDBType";
 import {BlogOutputType} from "../IO Types/BlogOutputType";
-import {PostsQRepo} from "../Repositories/PostsQRepo";
-import {NotFoundError} from "../helpers/ErrorHandler";
+import {CustomError, HttpStatuses, NotFoundError} from "../helpers/ErrorHandler";
 import {injectable} from "inversify";
 
 @injectable()
@@ -19,7 +18,11 @@ export class PostsServices {
 
     async SetUpNewPost(content: InputPostType) {
         const foundBlog:BlogOutputType|null = await this.blogsQRepo.ShowBlogByID(content.blogId)
-
+    if (!foundBlog){throw new CustomError (
+        'Invalid blog ID',
+        HttpStatuses.BadRequest,
+        [{message: 'Blog with stated lodId does not exist', field: 'blogId'}]
+    )}
         const post = new PostDBType(
             new ObjectId(),
             content.title,

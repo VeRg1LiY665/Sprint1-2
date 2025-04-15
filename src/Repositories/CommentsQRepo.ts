@@ -20,6 +20,7 @@ export class CommentsQRepo{
             .sort({[dto.sortBy] : dto.sortDirection===1 ? 1 :-1})
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
+            .lean()
 
         if (comments.length === 0) {}
         return comments.map(el=> (this.mapToOutput(el)))
@@ -27,7 +28,7 @@ export class CommentsQRepo{
 
     async ShowCommentByID(id: string):Promise<CommentOutputType | null> {
         const _id = new ObjectId(id)
-        const comment = await CommentModel.findOne({_id: _id});
+        const comment = await CommentModel.findOne({_id: _id}).lean();
         if (comment===null) {
             return null
         }
@@ -44,6 +45,7 @@ export class CommentsQRepo{
         let MappedComment:any = {id : (comment._id).toString(), ...comment}
         delete MappedComment._id
         delete MappedComment.postID
+        delete MappedComment.__v
         return MappedComment as CommentOutputType
     }
 

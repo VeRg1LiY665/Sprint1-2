@@ -1,4 +1,3 @@
-import {SETTINGS} from "../settings";
 import mongoose from "mongoose";
 import {blogsSchema} from "../Schemas/blogsSchema";
 import {postsSchema} from "../Schemas/postsSchema";
@@ -39,7 +38,7 @@ export class DB {
 
     async stop() {
         await mongoose.disconnect();
-        console.log('Connection successful closed');
+        console.log('Connection successfully closed');
     }
 
     async drop() {
@@ -51,50 +50,10 @@ export class DB {
 
 
         } catch (e: unknown) {
-            console.error('Error in drop db:', e);
+            console.error('db drop error:', e);
             await mongoose.disconnect();
         }
     }
 }
 
 
-/*
-export const db = {
-
-    async runDB(url: string): Promise<boolean> {
-
-        try {
-            await mongoose.connect(url);  //connect to db with mongoose
-
-            if (mongoose.connection.readyState === 1)
-            {console.log('Connected successfully to mongo server');}
-            return true;
-
-        } catch (e: unknown) {
-            console.error("Can't connect to mongo server", e);
-
-            await mongoose.disconnect();
-            return false;
-        }
-    },
-
-    async stop() {
-        await mongoose.disconnect();
-        console.log('Connection successful closed');
-    },
-
-    async drop() {
-        try {
-
-            await mongoose.connect(url);
-                await mongoose.connection.db!.dropDatabase();  //даже с проверкой все равно ts ругается на possibly undefined
-                console.log('db dropped successfully')
-
-
-        } catch (e: unknown) {
-            console.error('Error in drop db:', e);
-            await mongoose.disconnect();
-        }
-    },
-
-}*/

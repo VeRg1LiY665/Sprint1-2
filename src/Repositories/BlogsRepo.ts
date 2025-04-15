@@ -8,7 +8,7 @@ import {injectable} from "inversify";
 export class BlogsRepo {
     async ShowBlogByID (id:string) {
         const _id = new ObjectId(id)
-        const blog = await BlogModel.findOne({_id: _id});
+        const blog = await BlogModel.findOne({_id: _id}).lean();
         if (blog===null) {
             return null
         }
