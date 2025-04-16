@@ -8,7 +8,6 @@ export class LikesRepo {
         const res = await LikesModel
             .findOne({
                 $and:[
-                    {userId : userId},
                     {parentId: parentId},
                     {commentId: commentId}]
             })
@@ -29,11 +28,11 @@ export class LikesRepo {
         return res.matchedCount === 1;
     }
 
-    async CountReactions(userId:string, parentId:string) {
+    async CountReactions(userId:string, parentId:string, commentId:string) {
         const likes = await LikesModel.countDocuments(
             {$and:[
                     {userId : userId},
-                    {parentId: parentId},
+                    {commentId : commentId},
                     {status: 'Like'}
                 ]}
         )
@@ -41,7 +40,7 @@ export class LikesRepo {
         const dislikes = await LikesModel.countDocuments(
             {$and:[
                     {userId : userId},
-                    {parentId: parentId},
+                    {commentId : commentId},
                     {status: 'Dislike'}
                 ]}
         )

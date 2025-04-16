@@ -634,5 +634,5 @@ describe('comments/commentId/like-status', () => {
         expect(LikedComments.body.items[1].likesInfo.myStatus).toEqual('None')
         expect(LikedComments.body.items[0].likesInfo.myStatus).toEqual('Like')
     })
-
+        //TODO дописать два теста из инкубаторского сьюта
 })

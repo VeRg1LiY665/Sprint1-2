@@ -34,7 +34,8 @@ protected commentsRepo:CommentsRepo
         await this.likesRepo.UpdateLikeEntity(reaction)
     }
 
-    const {likes, dislikes} = await this.likesRepo.CountReactions(comment.commentatorInfo.userId.toString(), dto.parentId)
+    const {likes, dislikes} = await this.likesRepo.CountReactions(comment.commentatorInfo.userId.toString(), dto.parentId, comment._id.toString());
+
     comment.likesInfo.likesCount = likes
     comment.likesInfo.dislikesCount = dislikes
 
