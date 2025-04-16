@@ -620,19 +620,19 @@ describe('comments/commentId/like-status', () => {
                 .expect(201);
         }
 
-        /*await request(app)
+        await request(app)
             .put(SETTINGS.PATH.COMMENTS + `/${ResultingComments[1].body.id}` + '/like-status')
             .set('Authorization', `Bearer `+ATokens[0])
             .send({likeStatus:'Like'})
-            .expect(204)*/
+            .expect(204)
 
         const LikedComments = await request(app)
             .get(SETTINGS.PATH.POSTS + `/${newPost.id}` + '/comments')
             .set('Authorization', `Bearer `+ATokens[0])
             .expect(200)
-console.log(LikedComments.body.items)
-        expect(LikedComments.body.items[0].likesInfo.myStatus).toEqual('None')
-        expect(LikedComments.body.items[1].likesInfo.myStatus).toEqual('Like')
+
+        expect(LikedComments.body.items[1].likesInfo.myStatus).toEqual('None')
+        expect(LikedComments.body.items[0].likesInfo.myStatus).toEqual('Like')
     })
 
 })

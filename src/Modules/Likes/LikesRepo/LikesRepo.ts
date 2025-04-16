@@ -4,12 +4,13 @@ import {LikesModel} from "../../../db/mongoDB";
 
 @injectable()
 export class LikesRepo {
-    async ShowReaction(userId:string, parentId:string){
+    async ShowReaction(userId:string, parentId:string, commentId:string) {
         const res = await LikesModel
             .findOne({
                 $and:[
                     {userId : userId},
-                    {parentId: parentId}]
+                    {parentId: parentId},
+                    {commentId: commentId}]
             })
             .lean()
         return res;

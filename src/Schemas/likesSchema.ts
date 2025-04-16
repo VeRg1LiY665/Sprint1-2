@@ -13,4 +13,5 @@ export const likesSchema = new mongoose.Schema<LikesDBType>({
     },
     userId: String,
     parentId: String,
+    commentId: String,
 })

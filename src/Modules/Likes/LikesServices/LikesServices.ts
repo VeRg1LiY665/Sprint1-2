@@ -17,13 +17,14 @@ protected commentsRepo:CommentsRepo
     if(!comment)
         {throw new NotFoundError('Comment not found')}
 
-    const reaction = await this.likesRepo.ShowReaction(comment.commentatorInfo.userId.toString(), dto.parentId);
+    const reaction = await this.likesRepo.ShowReaction(comment.commentatorInfo.userId.toString(), dto.parentId, comment._id.toString());
     if(!reaction){
         const newReaction = new LikesDBType (
             new ObjectId(),
             dto.likeStatus,
-            comment.commentatorInfo.userId.toString(),
-            dto.parentId
+            comment.commentatorInfo.userId.toString(),  //в теории достаточно только commentId
+            dto.parentId,
+            comment._id.toString()
         )
 
         await this.likesRepo.CreateLikeEntity(newReaction)
