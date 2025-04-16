@@ -7,7 +7,6 @@ import {CommentsRepo} from "../Repositories/CommentsRepo";
 import {ForbiddenError, NotFoundError} from "../helpers/ErrorHandler";
 import {injectable} from "inversify";
 import {CommentsQRepo} from "../Repositories/CommentsQRepo";
-import {CommentOutputType} from "../IO Types/CommentOutputType";
 import {AuthServices} from "../Auth/Services/AuthService";
 import {LikesRepo} from "../Modules/Likes/LikesRepo/LikesRepo";
 
@@ -34,7 +33,7 @@ export class CommentsServices {
             {
                 likesCount: 0,
                 dislikesCount: 0,
-                myStatus: 'null'}
+                myStatus: 'None'}
         )
 
         try {await this.commentsRepo.SetUpNewComment(comment)}
@@ -45,14 +44,14 @@ export class CommentsServices {
         return comment._id.toString()
     }
 
-    async DeleteComment (id:string, userId: string) { //нужна проверка что удаляем свой коммент
+    async DeleteComment (id:string, userId: string) {
         const comment = await this.commentsRepo.ShowCommentByID(id)
         if (comment===null) {throw new NotFoundError('Comment not found')}
         if (userId!==comment.commentatorInfo.userId.toString()){throw new ForbiddenError('Access denied')}
         return await this.commentsRepo.DeleteComment(id)
     }
 
-    async UpdateComment(id:string, userId: string, content:InputCommentType){//нужна проверка что удаляем свой коммент
+    async UpdateComment(id:string, userId: string, content:InputCommentType){
         const comment = await this.commentsRepo.ShowCommentByID(id)
         if (comment===null) {throw new NotFoundError('Comment not found')}
         if (userId!==comment.commentatorInfo.userId.toString()){throw new ForbiddenError('Access denied')}
@@ -93,8 +92,21 @@ export class CommentsServices {
         return result
     }
 
-    async GetCommentById(id:string){
-//TODO перенести сюда логику из контроллера
+    async GetCommentById(dto:{id:string, authData:string|undefined}) {
+
+        const comment = await this.commentsQRepo.ShowCommentByID(dto.id)
+        if (!comment) {
+            throw new NotFoundError('Comment not found')
+        }
+
+        if(dto.authData) {
+            const userData = await this.authServices.checkAccessToken(dto.authData)
+
+                const reaction = await this.likesRepo.ShowReaction(comment.commentatorInfo.userId, userData.userId.toString())
+                if(reaction) {comment.likesInfo.myStatus = reaction.status}
+        }
+
+        return comment
     }
 }
 

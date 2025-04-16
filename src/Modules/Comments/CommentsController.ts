@@ -17,7 +17,7 @@ export class CommentsController {
     private usersQRepo: UsersQRepo){}
 
     async getComments(req: Request, res: Response,  next:NextFunction) {
-    try { //TODO перенести геты в сервис
+    try {
     const foundPost = await this.postsQRepo.ShowPostByID(req.params.id);
     if (foundPost===null) {throw new NotFoundError('Post not found')}
 
@@ -34,10 +34,6 @@ export class CommentsController {
         authData
     })
 
-    /*const commentsCount = await this.commentsQRepo.CommentsCounter(postId)
-    const result = this.commentsQRepo.PaginationMap(
-        {pageNumber, pageSize, commentsCount, comments}
-    )*/
     res.status(200).json(comments)
     }
     catch(err){next(err)}
@@ -45,11 +41,15 @@ export class CommentsController {
 
     async getCommentByID(req: Request, res: Response, next:NextFunction) {
     try {
-        const result = await this.commentsQRepo.ShowCommentByID(req.params.id)
-        if (result === null) {
-            throw new NotFoundError('Comment not found')
+        const authData = req.headers.authorization
+        const dto = {
+            id: req.params.id,
+            authData: authData
         }
-        res.status(200).json(result)
+
+        const comment = await this.commentsServices.GetCommentById(dto)
+
+        res.status(200).json(comment)
     }
     catch (err) {next(err)}
 }

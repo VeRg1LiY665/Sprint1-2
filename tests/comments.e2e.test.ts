@@ -32,7 +32,7 @@ describe('/comments', () => {
         done();
     });
 
-    it('shouldn\'t find comment, STATUS:404', async () => {
+    it('shouldn`t find comment, STATUS:404', async () => {
 
         const res = await req
             .get(SETTINGS.PATH.COMMENTS + '/' + new ObjectId())
@@ -286,8 +286,7 @@ const resp = await request(app)
             .expect(403);
     })
 })
-//TODO сделать тесты на лайки тут
-/*
+
 describe('comments/commentId/like-status', () => {
     let db: any
     let ATokens:any = []
@@ -310,7 +309,7 @@ describe('comments/commentId/like-status', () => {
         done();
     });
 
-    it('should create like for specific comment, STATUS:200', async () => {
+    it('should create like for specific comment, STATUS:204', async () => {
         ATokens=[]
 
         const blog = await createBlog(app)
@@ -333,12 +332,307 @@ describe('comments/commentId/like-status', () => {
 
         const comment = testingDtosCreator.createCommentDto({})
 
-        const resp = await request(app)
+        const ResultingComment = await request(app)
             .post(SETTINGS.PATH.POSTS + '/' + newPost.id + SETTINGS.PATH.COMMENTS)
             .set('Authorization', `Bearer `+ATokens[0])
             .send(comment)
             .expect(201);
 
-
+        await request(app)
+            .put(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}` + '/like-status')
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send({likeStatus:'Like'})
+            .expect(204)
     })
-})*/
+
+    it('should not create like for specific comment with incorrect input data, STATUS:400', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPost = await createPost(app, blog.id)
+        const user = await createUser(app)
+
+        const res = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/login')
+            .set('user-agent', 'Agent')
+            .send({
+                loginOrEmail: user.login,
+                password: '123456789',
+            })
+            .expect(200);
+
+        expect(res.body.accessToken).toContain('.');
+        expect(res.headers['set-cookie']).toBeDefined();
+
+        ATokens.push(res.body.accessToken);
+
+        const comment = testingDtosCreator.createCommentDto({})
+
+        const ResultingComment = await request(app)
+            .post(SETTINGS.PATH.POSTS + '/' + newPost.id + SETTINGS.PATH.COMMENTS)
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send(comment)
+            .expect(201);
+
+        await request(app)
+            .put(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}` + '/like-status')
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send({likeStatus:'Loik'})
+            .expect(400)
+    })
+
+    it('should not create like for specific comment without authorization, STATUS:401', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPost = await createPost(app, blog.id)
+        const user = await createUser(app)
+
+        const res = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/login')
+            .set('user-agent', 'Agent')
+            .send({
+                loginOrEmail: user.login,
+                password: '123456789',
+            })
+            .expect(200);
+
+        expect(res.body.accessToken).toContain('.');
+        expect(res.headers['set-cookie']).toBeDefined();
+
+        ATokens.push(res.body.accessToken);
+
+        const comment = testingDtosCreator.createCommentDto({})
+
+        const ResultingComment = await request(app)
+            .post(SETTINGS.PATH.POSTS + '/' + newPost.id + SETTINGS.PATH.COMMENTS)
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send(comment)
+            .expect(201);
+
+        await request(app)
+            .put(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}` + '/like-status')
+            .set('Authorization', `Bearer `)
+            .send({likeStatus:'Like'})
+            .expect(401)
+    })
+
+    it('should not create like for non-existent comment, STATUS:404', async () => {
+        ATokens=[]
+
+        const user = await createUser(app)
+
+        const res = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/login')
+            .set('user-agent', 'Agent')
+            .send({
+                loginOrEmail: user.login,
+                password: '123456789',
+            })
+            .expect(200);
+
+        expect(res.body.accessToken).toContain('.');
+        expect(res.headers['set-cookie']).toBeDefined();
+
+        ATokens.push(res.body.accessToken);
+
+        const testId = new ObjectId().toString()
+        await request(app)
+            .put(SETTINGS.PATH.COMMENTS + `/${testId}` + '/like-status')
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send({likeStatus:'Like'})
+            .expect(404)
+    })
+
+    it('should cancel like for specific comment, STATUS:200', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPost = await createPost(app, blog.id)
+        const user = await createUser(app)
+
+        const res = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/login')
+            .set('user-agent', 'Agent')
+            .send({
+                loginOrEmail: user.login,
+                password: '123456789',
+            })
+            .expect(200);
+
+        expect(res.body.accessToken).toContain('.');
+        expect(res.headers['set-cookie']).toBeDefined();
+
+        ATokens.push(res.body.accessToken);
+
+        const comment = testingDtosCreator.createCommentDto({})
+
+        const ResultingComment = await request(app)
+            .post(SETTINGS.PATH.POSTS + '/' + newPost.id + SETTINGS.PATH.COMMENTS)
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send(comment)
+            .expect(201);
+
+        await request(app)
+            .put(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}` + '/like-status')
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send({likeStatus:'Like'})
+            .expect(204)
+
+        const likedComment = await request(app)
+            .get(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}`)
+            .set('Authorization', `Bearer `+ATokens[0])
+            .expect(200)
+
+        expect(likedComment.body.likesInfo.likesCount).toEqual(1)
+
+        await request(app)
+            .put(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}` + '/like-status')
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send({likeStatus:'Dislike'})
+            .expect(204)
+
+        const dislikedComment = await request(app)
+            .get(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}`)
+            .set('Authorization', `Bearer `+ATokens[0])
+            .expect(200)
+
+        expect(dislikedComment.body.likesInfo.likesCount).toEqual(0)
+        expect(dislikedComment.body.likesInfo.dislikesCount).toEqual(1)
+    })
+
+    it('should show likeStatus for authorized user, STATUS:200', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPost = await createPost(app, blog.id)
+        const user = await createUser(app)
+
+        const res = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/login')
+            .set('user-agent', 'Agent')
+            .send({
+                loginOrEmail: user.login,
+                password: '123456789',
+            })
+            .expect(200);
+
+        expect(res.body.accessToken).toContain('.');
+        expect(res.headers['set-cookie']).toBeDefined();
+
+        ATokens.push(res.body.accessToken);
+
+        const comment = testingDtosCreator.createCommentDto({})
+
+        const ResultingComment = await request(app)
+            .post(SETTINGS.PATH.POSTS + '/' + newPost.id + SETTINGS.PATH.COMMENTS)
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send(comment)
+            .expect(201);
+
+        await request(app)
+            .put(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}` + '/like-status')
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send({likeStatus:'Like'})
+            .expect(204)
+
+        const likedComment = await request(app)
+            .get(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}`)
+            .set('Authorization', `Bearer `+ATokens[0])
+            .expect(200)
+
+        expect(likedComment.body.likesInfo.likesCount).toEqual(1)
+        expect(likedComment.body.likesInfo.myStatus).toEqual('Like')
+    })
+
+    it('should show likeStatus = none for non authorized user, STATUS:200', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPost = await createPost(app, blog.id)
+        const user = await createUser(app)
+
+        const res = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/login')
+            .set('user-agent', 'Agent')
+            .send({
+                loginOrEmail: user.login,
+                password: '123456789',
+            })
+            .expect(200);
+
+        expect(res.body.accessToken).toContain('.');
+        expect(res.headers['set-cookie']).toBeDefined();
+
+        ATokens.push(res.body.accessToken);
+
+        const comment = testingDtosCreator.createCommentDto({})
+
+        const ResultingComment = await request(app)
+            .post(SETTINGS.PATH.POSTS + '/' + newPost.id + SETTINGS.PATH.COMMENTS)
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send(comment)
+            .expect(201);
+
+        await request(app)
+            .put(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}` + '/like-status')
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send({likeStatus:'Like'})
+            .expect(204)
+
+        const likedComment = await request(app)
+            .get(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}`)
+            .expect(200)
+
+        expect(likedComment.body.likesInfo.likesCount).toEqual(1)
+        expect(likedComment.body.likesInfo.myStatus).toEqual('None')
+    })
+
+    it('should show likeStatus = None, Like for specific post`s comments , STATUS:200', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPost = await createPost(app, blog.id)
+        const user = await createUser(app)
+
+        const res = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/login')
+            .set('user-agent', 'Agent')
+            .send({
+                loginOrEmail: user.login,
+                password: '123456789',
+            })
+            .expect(200);
+
+        expect(res.body.accessToken).toContain('.');
+        expect(res.headers['set-cookie']).toBeDefined();
+
+        ATokens.push(res.body.accessToken);
+
+        const comments = testingDtosCreator.createCommentDtos(1)
+        let ResultingComments =[]
+
+        for (let i =0; i<2; i++) {
+            ResultingComments[i] = await request(app)
+                .post(SETTINGS.PATH.POSTS + '/' + newPost.id + SETTINGS.PATH.COMMENTS)
+                .set('Authorization', `Bearer ` + ATokens[0])
+                .send(comments[i])
+                .expect(201);
+        }
+
+        /*await request(app)
+            .put(SETTINGS.PATH.COMMENTS + `/${ResultingComments[1].body.id}` + '/like-status')
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send({likeStatus:'Like'})
+            .expect(204)*/
+
+        const LikedComments = await request(app)
+            .get(SETTINGS.PATH.POSTS + `/${newPost.id}` + '/comments')
+            .set('Authorization', `Bearer `+ATokens[0])
+            .expect(200)
+console.log(LikedComments.body.items)
+        expect(LikedComments.body.items[0].likesInfo.myStatus).toEqual('None')
+        expect(LikedComments.body.items[1].likesInfo.myStatus).toEqual('Like')
+    })
+
+})

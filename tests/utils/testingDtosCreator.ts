@@ -84,4 +84,16 @@ export const testingDtosCreator = {
             content.content ?? 'example content for comment',
         )
     },
+
+    createCommentDtos(count:number): InputCommentType[] {
+        const comments =[]
+
+        for (let i = 0; i <= count; i++) {
+            comments.push(new InputCommentType(
+                    `example content${i} for test comment ${i}`
+                )
+            )
+        }
+        return comments
+    },
 }

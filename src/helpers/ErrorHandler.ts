@@ -89,11 +89,23 @@ export class DuplicatedEmailError extends Error{
 
 export const ErrorHandler = async(err:any, req:Request, res: Response, next:NextFunction) => {
 
+    if(err.errors)   //Кастомный обработчик ошибок валидации mongoose (альтернатива - кастомный валидатор в schema)
+    {const resultErrMessage = {errorsMessages:
+            [{
+              message: err.errors.status.properties.message,
+              field: (err.errors.status.properties.message.replace(/\s.*/,""))
+            }]
+    }
+
+     res.status(HttpStatuses.BadRequest).send(resultErrMessage)
+    return}
+
     if (err.status !== undefined) {
         const resultErrMessage = {errorsMessages: err.extensions}; //здесь привел вывод ошибки к тому что ожидается тестами
-        //console.log(err.message)
+        //console.log(err.message)  //только для быстрого дебага оставляю этот лог
         res.status(err.status).send(resultErrMessage) //пока возвращаю по одной, в перспективе можно копить массив через next, потом возвращать прям массивом ошибки
     } else {
+        console.log(err.errors)
         console.error(err) //если брошена обычная ошибка (например монго отъехала), то она здесь залогируется и обработается
         res.status(500).send(err.message)
     }

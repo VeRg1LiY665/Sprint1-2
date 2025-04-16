@@ -12,7 +12,7 @@ protected likesRepo:LikesRepo,
 protected commentsRepo:CommentsRepo
     ){}
 
-    async CreateReaction(dto: {commentId:string, parentId:string, likeStatus:string}){
+    async CreateReaction(dto: {commentId:string, parentId:string, likeStatus:string}):Promise<void> {
     const comment = await this.commentsRepo.ShowCommentByID(dto.commentId);
     if(!comment)
         {throw new NotFoundError('Comment not found')}
@@ -25,6 +25,7 @@ protected commentsRepo:CommentsRepo
             comment.commentatorInfo.userId.toString(),
             dto.parentId
         )
+
         await this.likesRepo.CreateLikeEntity(newReaction)
     }
     else {
@@ -33,10 +34,11 @@ protected commentsRepo:CommentsRepo
     }
 
     const {likes, dislikes} = await this.likesRepo.CountReactions(comment.commentatorInfo.userId.toString(), dto.parentId)
-
     comment.likesInfo.likesCount = likes
     comment.likesInfo.dislikesCount = dislikes
+
     await this.commentsRepo.ChangeCommentReactionCount(comment)
+        return
     }
 
 

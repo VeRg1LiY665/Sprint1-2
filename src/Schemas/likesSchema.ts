@@ -8,7 +8,7 @@ export const likesSchema = new mongoose.Schema<LikesDBType>({
         type: String,
         enum: {
             values: ['Like', 'Dislike', 'None'],
-            message: '{VALUE} is not supported'   //TODO проверить упадет ли message в ErrorHandler
+            message: 'likeStatus {VALUE} is not supported'
         }
     },
     userId: String,

@@ -11,11 +11,12 @@ export class LikesController {
         try {
             const dto= {
                 commentId:req.params.id,
-                parentId:res.locals.user.id,
+                parentId:res.locals.user.userId,
                 likeStatus:req.body.likeStatus
             }
-
             await this.likesServices.CreateReaction(dto)
+
+            res.sendStatus(204)
         }
         catch (err) {next(err)}
     }
