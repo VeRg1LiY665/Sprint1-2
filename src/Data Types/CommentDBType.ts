@@ -10,6 +10,11 @@ export class CommentDBType {
     },
     public postID: ObjectId,
     public createdAt: string,
+    public likesInfo: {
+        likesCount: number;
+        dislikesCount: number;
+        myStatus: string
+    }
     ){}
 }
 

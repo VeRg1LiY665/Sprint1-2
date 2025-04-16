@@ -4,7 +4,7 @@ import {LikesModel} from "../../../db/mongoDB";
 
 @injectable()
 export class LikesRepo {
-    async ShowLike(userId:string, parentId:string){
+    async ShowReaction(userId:string, parentId:string){
         const res = await LikesModel
             .findOne({
                 $and:[

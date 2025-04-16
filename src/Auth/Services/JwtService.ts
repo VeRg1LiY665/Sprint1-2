@@ -22,10 +22,11 @@ export class JwtService {
         );
     }
 
-    async verifyToken(token: string): Promise<{ deviceId: ObjectId }> {
+    async verifyToken(token: string): Promise<{ userId: ObjectId, deviceId: ObjectId }> {
         try {
             return jwt.verify(token, SETTINGS.AC_SECRET) as
-                {deviceId: ObjectId};
+                {userId: ObjectId,
+                 deviceId: ObjectId};
         } catch (error) {
             console.error('Cannot verify access token');
             throw new InvalidCredentialsError('Invalid credentials',

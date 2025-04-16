@@ -29,5 +29,13 @@ export class CommentsRepo {
         )
         return res.matchedCount === 1;
     }
+
+    async ChangeCommentReactionCount(comment:CommentDBType) {
+        const res = await CommentModel.updateOne(
+            {_id: comment._id},
+            {$set:{...comment}}
+        )
+        return res.matchedCount === 1;
+    }
 }
 

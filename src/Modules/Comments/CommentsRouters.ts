@@ -1,13 +1,15 @@
 import {Router} from "express";
+import {LikesController} from "../Likes/LikesController";
 import {CommentsController} from "./CommentsController";
 import {accessTokenGuard} from "../../Auth/guards/AccesTokenGuard";
 import {CommentContentValidation, IDValidationMiddleware} from "./CommentsMiddlewares";
 import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
 import {container} from "../../composition-root";
 
+
 export const commentsRouter = Router();
 const commentsController = container.get(CommentsController);
-
+const likesController = container.get(LikesController);
 
 commentsRouter.get('/:id',
     IDValidationMiddleware,
@@ -24,4 +26,8 @@ commentsRouter.put('/:id',
     CommentContentValidation,
     ErrorCollectionMiddleware,
     commentsController.updateComment.bind(commentsController))
+
+commentsRouter.put('/:id/like-status',
+    accessTokenGuard,
+    likesController.CreateReaction.bind(likesController))
 

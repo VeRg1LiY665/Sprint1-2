@@ -11,34 +11,34 @@ import {injectable} from "inversify";
 
 @injectable()
 export class CommentsController {
-    private commentsQRepo: CommentsQRepo;
-    private commentsServices: CommentsServices;
-    private postsQRepo: PostsQRepo;
-    private usersQRepo: UsersQRepo;
-    constructor (){
-        this.commentsQRepo = new CommentsQRepo();
-        this.commentsServices = new CommentsServices();
-        this.postsQRepo = new PostsQRepo();
-        this.usersQRepo = new UsersQRepo();
-    }
+    constructor (private commentsQRepo: CommentsQRepo,
+    private commentsServices: CommentsServices,
+    private postsQRepo: PostsQRepo,
+    private usersQRepo: UsersQRepo){}
 
     async getComments(req: Request, res: Response,  next:NextFunction) {
-    try {
+    try { //TODO перенести геты в сервис
     const foundPost = await this.postsQRepo.ShowPostByID(req.params.id);
     if (foundPost===null) {throw new NotFoundError('Post not found')}
 
     const {pageNumber, pageSize, sortBy, sortDirection, postId} = commentsPaginationQueries(req)
 
-    const comments = await this.commentsQRepo.ShowCommentsForPost({
+    const authData = req.headers.authorization  //для проверки авторизованности
+
+    const comments = await this.commentsServices.GetCommentsForPost({
         pageNumber,
         pageSize,
         sortBy,
         sortDirection,
-        postId
+        postId,
+        authData
     })
-    const commentsCount = await this.commentsQRepo.CommentsCounter(postId)
-    const result = this.commentsQRepo.PaginationMap({pageNumber, pageSize, commentsCount, comments})
-    res.status(200).json(result)
+
+    /*const commentsCount = await this.commentsQRepo.CommentsCounter(postId)
+    const result = this.commentsQRepo.PaginationMap(
+        {pageNumber, pageSize, commentsCount, comments}
+    )*/
+    res.status(200).json(comments)
     }
     catch(err){next(err)}
 }
@@ -96,5 +96,4 @@ export class CommentsController {
 
 }
 
-/*export const commentsController = new CommentsController();*/
 

@@ -26,6 +26,9 @@ import {DevicesServices} from "./Security/Services/DevicesService";
 import {DevicesRepo} from "./Security/Repositories/DevicesRepo";
 import {DevicesQRepo} from "./Security/Repositories/DevicesQRepo";
 import {RequestsRepo} from "./Security/Repositories/RequestsRepo";
+import {LikesRepo} from "./Modules/Likes/LikesRepo/LikesRepo";
+import {LikesServices} from "./Modules/Likes/LikesServices/LikesServices";
+import {LikesController} from "./Modules/Likes/LikesController";
 
 
 export const container: Container = new Container();
@@ -63,6 +66,9 @@ container.bind(DevicesQRepo).toSelf();
 
 container.bind(RequestsRepo).toSelf();
 
+container.bind(LikesController).toSelf();
+container.bind(LikesServices).toSelf();
+container.bind(LikesRepo).toSelf();
 //////////////////////////////////////////////////////
 /*
 let objects:any[] = []

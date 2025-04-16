@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {BlogModel, CommentModel} from "../db/mongoDB";
+import {CommentModel} from "../db/mongoDB";
 import {CommentOutputType} from "../IO Types/CommentOutputType";
 import {CommentDBType} from "../Data Types/CommentDBType";
 import {injectable} from "inversify";
