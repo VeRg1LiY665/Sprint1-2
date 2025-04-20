@@ -18,14 +18,4 @@ export class CommentDBType {
     ){}
 }
 
-/*
-export type CommentDBType = {
-    _id: ObjectId;
-    content: string;
-    commentatorInfo: {
-        userId:ObjectId;
-        userLogin:string;
-    }
-    postID: ObjectId;
-    createdAt: string;
-}*/
+

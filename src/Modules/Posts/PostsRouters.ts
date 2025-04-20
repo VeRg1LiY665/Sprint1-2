@@ -17,10 +17,12 @@ import {CommentsController} from "../Comments/CommentsController";
 import {accessTokenGuard} from "../../Auth/guards/AccesTokenGuard";
 import {CommentContentValidation} from "../Comments/CommentsMiddlewares";
 import {container} from "../../composition-root";
+import {LikesController} from "../Likes/LikesController";
 export const postRouter = Router();
 
 const postsController = container.get(PostsController);
 const commentsController = container.get(CommentsController);
+const likesController = container.get(LikesController);
 
 postRouter.get('/',
     PostQueryPageNumberValidation,
@@ -64,3 +66,7 @@ postRouter.put('/:id',
     ErrorCollectionMiddleware,
     ObjectIdValidationMiddleware,
     postsController.updatePost.bind(postsController))
+
+postRouter.put('/:id/like-status',
+    accessTokenGuard,
+    likesController.CreateReactionForPost.bind(likesController) )

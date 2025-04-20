@@ -78,7 +78,7 @@ export class CommentsServices {
         if(dto.authData) {
             const userData = await this.authServices.checkAccessToken(dto.authData)
             for (let i = 0; i<commentsCount; i++) {
-                 const reaction = await this.likesRepo.ShowReaction(comments[i].commentatorInfo.userId, userData.userId.toString(), comments[i].id)
+                 const reaction = await this.likesRepo.ShowReactionForComment(comments[i].commentatorInfo.userId, userData.userId.toString(), comments[i].id)
                 if(reaction) {comments[i].likesInfo.myStatus = reaction.status}
             }
         }
@@ -102,7 +102,7 @@ export class CommentsServices {
         if(dto.authData) {
             const userData = await this.authServices.checkAccessToken(dto.authData)
 
-                const reaction = await this.likesRepo.ShowReaction(comment.commentatorInfo.userId, userData.userId.toString(), comment.id)
+                const reaction = await this.likesRepo.ShowReactionForComment(comment.commentatorInfo.userId, userData.userId.toString(), comment.id)
                 if(reaction) {comment.likesInfo.myStatus = reaction.status}
         }
 

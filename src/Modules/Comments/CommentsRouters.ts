@@ -29,5 +29,5 @@ commentsRouter.put('/:id',
 
 commentsRouter.put('/:id/like-status',
     accessTokenGuard,
-    likesController.CreateReaction.bind(likesController))
+    likesController.CreateReactionForComment.bind(likesController))
 

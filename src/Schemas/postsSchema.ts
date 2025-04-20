@@ -9,5 +9,15 @@ export const postsSchema = new mongoose.Schema<PostDBType>({
     content: String,
     blogId: String,
     blogName: String,
-    createdAt: String
+    createdAt: String,
+    extendedLikesInfo: {
+        likesCount: Number,
+        dislikesCount: Number,
+        myStatus: String,
+        newestLikes: [{
+            addedAt: String,
+            userId: String,
+            login: String
+        }]
+    }
 })

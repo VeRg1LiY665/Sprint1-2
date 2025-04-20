@@ -3,7 +3,7 @@ import {LikesModel} from "../../../db/mongoDB";
 
 @injectable()
 export class LikesQRepo {
-   /* async CountReactions(userId:string, parentId:string) {
+   /* async FindLastThreeLikesForPost(userId:string, parentId:string) {
         const likes = await LikesModel.countDocuments(
             {$and:[
                     {userId : userId},

@@ -634,5 +634,59 @@ describe('comments/commentId/like-status', () => {
         expect(LikedComments.body.items[1].likesInfo.myStatus).toEqual('None')
         expect(LikedComments.body.items[0].likesInfo.myStatus).toEqual('Like')
     })
-        //TODO дописать два теста из инкубаторского сьюта
+
+    it('should create likes/dislikes for specific comment by 4 different users, STATUS:200', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPost = await createPost(app, blog.id)
+
+        await createUsers(app,3);  //create 4 users
+
+
+        for (let i = 0; i < 4; i++) {
+            const res = await request(app)
+                .post(SETTINGS.PATH.AUTH + '/login')
+                .set('user-agent', 'Agent' + i)
+                .send({
+                    loginOrEmail: `test${i}`,
+                    password: '12345678'
+                })
+                .expect(200);
+
+            expect(res.body.accessToken).toContain('.');
+            expect(res.headers['set-cookie']).toBeDefined();
+
+            ATokens.push(res.body.accessToken);
+        }
+
+        const comment = testingDtosCreator.createCommentDto({})
+
+        const ResultingComment = await request(app)
+            .post(SETTINGS.PATH.POSTS + '/' + newPost.id + SETTINGS.PATH.COMMENTS)
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send(comment)
+            .expect(201);
+
+        for (let i = 0; i < 4; i++ ) {
+            await request(app)
+                .put(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}` + '/like-status')
+                .set('Authorization', `Bearer `+ATokens[i])
+                .send({likeStatus: (i%2==0) ? 'Like' : 'Dislike'})
+                .expect(204)
+        }
+
+        for (let i = 0 ; i<4; i++) {
+            const Comment = await request(app)
+                .get(SETTINGS.PATH.COMMENTS + `/${ResultingComment.body.id}`)
+                .set('Authorization', `Bearer `+ATokens[i])
+                .expect(200)
+
+            expect(Comment.body.likesInfo.likesCount).toEqual(2)
+            expect(Comment.body.likesInfo.dislikesCount).toEqual(2)
+            expect(Comment.body.likesInfo.myStatus).toEqual((i%2==0) ? 'Like' : 'Dislike')
+        }
+
+    })
+
 })

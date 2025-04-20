@@ -4,7 +4,7 @@ import {LikesModel} from "../../../db/mongoDB";
 
 @injectable()
 export class LikesRepo {
-    async ShowReaction(userId:string, parentId:string, commentId:string) {
+    async ShowReactionForComment(userId:string, parentId:string, commentId:string) {
         const res = await LikesModel
             .findOne({
                 $and:[
@@ -28,10 +28,10 @@ export class LikesRepo {
         return res.matchedCount === 1;
     }
 
-    async CountReactions(userId:string, parentId:string, commentId:string) {
+    async CountReactionsForComment(userId:string, parentId:string, commentId:string) {
         const likes = await LikesModel.countDocuments(
             {$and:[
-                    {userId : userId},
+                    {userId : userId},  //TODO проверить работу без userId
                     {commentId : commentId},
                     {status: 'Like'}
                 ]}
@@ -48,4 +48,42 @@ export class LikesRepo {
         return {likes, dislikes};
     }
 
+    async ShowReactionForPost(parentId:string, postId:string) {
+        const res = await LikesModel
+            .findOne({
+                $and:[
+                    {parentId: parentId},
+                    {postId: postId}]
+            })
+            .lean()
+        return res;
+    }
+
+    async CountReactionsForPost(postId:string) {
+        const likes = await LikesModel.countDocuments(
+            {$and:[
+                    {postId : postId},
+                    {status: 'Like'}
+                ]}
+        )
+
+        const dislikes = await LikesModel.countDocuments(
+            {$and:[
+                    {postId : postId},
+                    {status: 'Dislike'}
+                ]}
+        )
+
+        return {likes, dislikes};
+    }
+
+    async ShowLastReactionsForPost(postId:string) {
+        const res = await LikesModel
+            .find({postId:postId})
+            .sort({['addedAt'] : -1})
+            .limit(3)
+            .lean()
+
+        return res
+    }
 }

@@ -30,13 +30,21 @@ export class PostsServices {
             content.content,
             content.blogId,
             foundBlog!.name,
-            new Date().toISOString()
+            new Date().toISOString(),
+            {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: 'None',
+                newestLikes: [{
+                                addedAt: '',      //Заглушка для последних лайков при создании поста
+                                userId: '',
+                                login: ''
+                             }]
+            },
+
         )
 
-        try {await this.postsRepo.SetUpNewPost(post)}
-        catch (e) {
-            console.error(e)
-            return null}
+        await this.postsRepo.SetUpNewPost(post)
 
         return post._id.toString()
     }
@@ -50,7 +58,17 @@ export class PostsServices {
             content.content,
             foundBlog!.id,
             foundBlog!.name,
-            new Date().toISOString()
+            new Date().toISOString(),
+            {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: 'None',
+                newestLikes: [{
+                    addedAt: '',      //Заглушка для последних лайков при создании поста
+                    userId: '',
+                    login: ''
+                }]
+            },
         )
 
         try {await this.postsRepo.SetUpNewPost(post)}
