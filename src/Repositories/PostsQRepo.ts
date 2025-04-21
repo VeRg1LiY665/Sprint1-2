@@ -59,7 +59,7 @@ export class PostsQRepo {
         return posts.map(el=> (this.mapToOutput(el)))
     }
 
-    async PostsCounter(searchNameTerm:string|null, blogId:string):Promise<number>{
+    async PostsCounter(searchNameTerm:string|null, blogId:string|null):Promise<number>{
         let filter:any={};
         if(searchNameTerm) {filter.title = {regex:searchNameTerm, options: 'i'}}
         if(blogId) {filter.blogId = blogId}

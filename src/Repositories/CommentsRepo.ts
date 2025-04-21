@@ -7,7 +7,9 @@ import {injectable} from "inversify";
 @injectable()
 export class CommentsRepo {
     async ShowCommentByID(id:string, ){
-        const result = await CommentModel.findOne({_id:new ObjectId(id)}).lean()
+        const result = await CommentModel
+            .findOne({_id:new ObjectId(id)})
+            .lean()
         return result
     }
 

@@ -13,3 +13,19 @@ export const createPost = async (app: any, blogId:string, post?: InputPostType) 
         .expect(201);
     return resp.body;
 };
+
+export const createPosts = async (app: any, blogId:string, blogsCount:number) => {
+    const dto = testingDtosCreator.createPostDtos(blogsCount, blogId);
+
+    for(let i = 0; i<blogsCount;i++) {
+        const resp = await request(app)
+            .post(SETTINGS.PATH.POSTS)
+            .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
+            .send(dto[i])
+            .expect(201);
+    }
+    const newPosts = await request(app)
+        .get(SETTINGS.PATH.POSTS)
+        .expect(200);
+    return newPosts;
+}

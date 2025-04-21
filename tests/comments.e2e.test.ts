@@ -545,7 +545,7 @@ describe('comments/commentId/like-status', () => {
         expect(likedComment.body.likesInfo.myStatus).toEqual('Like')
     })
 
-    it('should show likeStatus = none for non authorized user, STATUS:200', async () => {
+    it('should show likeStatus = None for non authorized user, STATUS:200', async () => {
         ATokens=[]
 
         const blog = await createBlog(app)

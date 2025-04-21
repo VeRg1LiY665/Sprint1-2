@@ -17,12 +17,26 @@ export class PostsController {
     )
 {}
 
-    async getPosts(req: Request, res: Response) {
-    const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm} = paginationQueries(req)
-    const posts = await this.postsQRepo.ShowAllPosts({pageNumber, pageSize, sortBy, sortDirection, searchNameTerm})
-    const postsCount = await this.blogsQRepo.BlogsCounter(searchNameTerm)
-    const result = this.postsQRepo.PaginationMap({pageNumber, pageSize, postsCount, posts})
-    res.status(200).json(result)
+    async getPosts(req: Request, res: Response, next:NextFunction) {
+
+    try{
+        const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm} = paginationQueries(req)
+
+        const authData = req.headers.authorization  //для проверки авторизованности
+
+        const posts = await this.postsServices.GetPosts({
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection,
+            searchNameTerm,
+            authData})
+
+        //const postsCount = await this.blogsQRepo.BlogsCounter(searchNameTerm)
+        //const result = this.postsQRepo.PaginationMap({pageNumber, pageSize, postsCount, posts})
+        res.status(200).json(posts)
+    }
+        catch (err) {next(err)}
     }
 
     async getPostByID(req: Request, res: Response, next:NextFunction) {

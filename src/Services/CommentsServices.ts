@@ -94,7 +94,7 @@ export class CommentsServices {
 
     async GetCommentById(dto:{id:string, authData:string|undefined}) {
 
-        const comment = await this.commentsQRepo.ShowCommentByID(dto.id)
+        const comment = await this.commentsQRepo.ShowCommentByID(dto.id) //Это не нарушение SQRS, просто пробрасываем query-запрос через сервис
         if (!comment) {
             throw new NotFoundError('Comment not found')
         }
@@ -102,7 +102,7 @@ export class CommentsServices {
         if(dto.authData) {
             const userData = await this.authServices.checkAccessToken(dto.authData)
 
-                const reaction = await this.likesRepo.ShowReactionForComment(comment.commentatorInfo.userId, userData.userId.toString(), comment.id)
+                const reaction = await this.likesRepo.ShowReactionForComment(comment.commentatorInfo.userId.toString(), userData.userId.toString(), comment.id)
                 if(reaction) {comment.likesInfo.myStatus = reaction.status}
         }
 

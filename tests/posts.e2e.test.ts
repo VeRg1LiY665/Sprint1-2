@@ -6,9 +6,9 @@ import request from "supertest";
 import {app} from "../src/app";
 import {createBlog} from "./utils/createBlogs";
 import {testingDtosCreator} from "./utils/testingDtosCreator";
-import {createPost} from "./utils/createPosts";
+import {createPost, createPosts} from "./utils/createPosts";
 import {ObjectId} from "mongodb";
-import {createUser} from "./utils/createUsers";
+import {createUser, createUsers} from "./utils/createUsers";
 
 
 describe('/posts', () => {
@@ -184,7 +184,7 @@ describe('posts/postId/like-status', () => {
             .put(SETTINGS.PATH.POSTS + `/${newPost.id}` + '/like-status')
             .set('Authorization', `Bearer `+ATokens[0])
             .send({likeStatus:'Loik'})
-            .expect(204)
+            .expect(400)
     })
 
     it('should not create like for specific post without authorization, STATUS:401', async () => {
@@ -325,5 +325,125 @@ describe('posts/postId/like-status', () => {
 
         expect(likedPost.body.extendedLikesInfo.likesCount).toEqual(1)
         expect(likedPost.body.extendedLikesInfo.myStatus).toEqual('Like')
+    })
+
+    it('should show likeStatus = None for non authorized user, STATUS:200', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPost = await createPost(app, blog.id)
+        const user = await createUser(app)
+
+        const res = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/login')
+            .set('user-agent', 'Agent')
+            .send({
+                loginOrEmail: user.login,
+                password: '123456789',
+            })
+            .expect(200);
+
+        expect(res.body.accessToken).toContain('.');
+        expect(res.headers['set-cookie']).toBeDefined();
+
+        ATokens.push(res.body.accessToken);
+
+        await request(app)
+            .put(SETTINGS.PATH.POSTS + `/${newPost.id}` + '/like-status')
+            .set('Authorization', `Bearer `+ATokens[0])
+            .send({likeStatus:'Like'})
+            .expect(204)
+
+        const likedPost = await request(app)
+            .get(SETTINGS.PATH.POSTS + `/${newPost.id}`)
+            .expect(200)
+
+        expect(likedPost.body.extendedLikesInfo.likesCount).toEqual(1)
+        expect(likedPost.body.extendedLikesInfo.myStatus).toEqual('None')
+    })
+
+    it('should show likeStatus = None, Like for specific blog`s posts , STATUS:200', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPosts = await createPosts(app, blog.id, 2)
+        const user = await createUser(app)
+
+        const res = await request(app)
+            .post(SETTINGS.PATH.AUTH + '/login')
+            .set('user-agent', 'Agent')
+            .send({
+                loginOrEmail: user.login,
+                password: '123456789',
+            })
+            .expect(200);
+
+        expect(res.body.accessToken).toContain('.');
+        expect(res.headers['set-cookie']).toBeDefined();
+
+        ATokens.push(res.body.accessToken);
+
+            await request(app)
+                .put(SETTINGS.PATH.POSTS + `/${newPosts.body.items[0].id}` + '/like-status')
+                .set('Authorization', `Bearer ` + ATokens[0])
+                .send({likeStatus: 'Like'})
+                .expect(204)
+
+
+        const Posts = await request(app)
+            .get(SETTINGS.PATH.POSTS)
+            .set('Authorization', `Bearer ` + ATokens[0])
+            .expect(200)
+
+            expect(Posts.body.items[0].extendedLikesInfo.likesCount).toEqual(1)
+            expect(Posts.body.items[0].extendedLikesInfo.myStatus).toEqual('Like')
+            expect(Posts.body.items[1].extendedLikesInfo.myStatus).toEqual('None')
+
+    })
+
+    it('should create likes/dislikes for specific post by 4 different users, STATUS:200', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPost = await createPost(app, blog.id)
+
+        await createUsers(app,3);  //create 4 users
+
+
+        for (let i = 0; i < 4; i++) {
+            const res = await request(app)
+                .post(SETTINGS.PATH.AUTH + '/login')
+                .set('user-agent', 'Agent' + i)
+                .send({
+                    loginOrEmail: `test${i}`,
+                    password: '12345678'
+                })
+                .expect(200);
+
+            expect(res.body.accessToken).toContain('.');
+            expect(res.headers['set-cookie']).toBeDefined();
+
+            ATokens.push(res.body.accessToken);
+        }
+
+        for (let i = 0; i < 4; i++ ) {
+            await request(app)
+                .put(SETTINGS.PATH.POSTS + `/${newPost.id}` + '/like-status')
+                .set('Authorization', `Bearer `+ATokens[i])
+                .send({likeStatus: (i%2==0) ? 'Like' : 'Dislike'})
+                .expect(204)
+        }
+
+        for (let i = 0 ; i<4; i++) {
+            const Post = await request(app)
+                .get(SETTINGS.PATH.POSTS + `/${newPost.id}`)
+                .set('Authorization', `Bearer `+ATokens[i])
+                .expect(200)
+
+            expect(Post.body.extendedLikesInfo.likesCount).toEqual(2)
+            expect(Post.body.extendedLikesInfo.dislikesCount).toEqual(2)
+            expect(Post.body.extendedLikesInfo.myStatus).toEqual((i%2==0) ? 'Like' : 'Dislike')
+        }
+
     })
 })

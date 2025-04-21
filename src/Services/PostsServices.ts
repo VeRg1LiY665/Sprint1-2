@@ -97,27 +97,28 @@ export class PostsServices {
         return await this.postsRepo.ChangePost(id, content)
     }
 
-    GetPosts(dto:{
+    async GetPosts(dto:{
         pageNumber:number,
         pageSize:number,
         sortBy: string,
         sortDirection:number,
-        postId:string,
+        searchNameTerm:string | null,
         authData:string|undefined}) {
 
-    const posts = await this.postsQRepo.ShowCommentsForPost({
+
+    const posts = await this.postsQRepo.ShowAllPosts({
         pageNumber:dto.pageNumber,
         pageSize:dto.pageSize,
         sortBy:dto.sortBy,
         sortDirection:dto.sortDirection,
-        postId:dto.postId
+        searchNameTerm:dto.searchNameTerm
     })
-    const commentsCount = await this.postsQRepo.CommentsCounter(dto.postId)
+    const postsCount = await this.postsQRepo.PostsCounter(dto.searchNameTerm, null)  //null - чтобы счетчик  работал с исходной типизацией
 
     if(dto.authData) {
     const userData = await this.authServices.checkAccessToken(dto.authData)
-    for (let i = 0; i<commentsCount; i++) {
-    const reaction = await this.likesRepo.ShowReactionForComment(posts[i].commentatorInfo.userId, userData.userId.toString(), posts[i].id)
+    for (let i = 0; i<postsCount; i++) {
+    const reaction = await this.likesRepo.ShowReactionForPost(userData.userId.toString(), posts[i].id)
     if(reaction) {posts[i].extendedLikesInfo.myStatus = reaction.status}
 }
 }
@@ -125,15 +126,15 @@ export class PostsServices {
 const result = this.postsQRepo.PaginationMap(
     {pageNumber:dto.pageNumber,
         pageSize:dto.pageSize,
-        commentsCount:commentsCount,
-        comments:posts})
+        postsCount:postsCount,
+        posts:posts})
 
 return result
     }
 
     async GetPostById(dto:{id:string, authData:string|undefined}) {
 
-        const post = await this.postsQRepo.ShowPostByID(dto.id)
+        const post = await this.postsQRepo.ShowPostByID(dto.id)  //Это не нарушение SQRS, просто пробрасываем query-запрос через сервис
         if (!post) {
             throw new NotFoundError('Post not found')
         }
