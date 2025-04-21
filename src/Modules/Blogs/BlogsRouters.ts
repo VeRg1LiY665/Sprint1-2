@@ -12,7 +12,6 @@ import {
 } from "./BlogsMiddlewares";
 import {Router} from "express";
 import {authMiddleware} from "../../Auth/Middlewares/BasicAuth";
-import {postsController} from "../Posts/PostsController";
 import {
     PostContentValidation,
     PostShortDescriptionValidation,
@@ -20,9 +19,11 @@ import {
 } from "../Posts/PostsMiddlewares";
 import {ErrorCollectionMiddleware} from "../../helpers/InputValidation";
 import {BlogsController} from "./BlogsController";
+import {PostsController} from "../Posts/PostsController";
 
 export const blogRouter = Router();
 const blogsController = container.get(BlogsController);
+const postsController = container.get(PostsController);
 
 blogRouter.get('/',
     BlogQueryPageNumberValidation,

@@ -9,15 +9,13 @@ import {injectable} from "inversify";
 
 @injectable()
 export class PostsController {
-    private postsQRepo: PostsQRepo;
-    private blogsQRepo: BlogsQRepo;
-    private postsServices: PostsServices;
 
-    constructor() {
-    this.postsQRepo = new PostsQRepo();
-    this.blogsQRepo = new BlogsQRepo();
-    this.postsServices = new PostsServices();
-    }
+    constructor(
+        private postsQRepo: PostsQRepo,
+        private blogsQRepo: BlogsQRepo,
+        private postsServices: PostsServices,
+    )
+{}
 
     async getPosts(req: Request, res: Response) {
     const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm} = paginationQueries(req)
@@ -29,14 +27,16 @@ export class PostsController {
 
     async getPostByID(req: Request, res: Response, next:NextFunction) {
     try {
-        const result = await this.postsQRepo.ShowPostByID(req.params.id)
 
-        if (result === null) {
-            throw new NotFoundError("Post not Found");
+        const authData = req.headers.authorization
+        const dto = {
+            id: req.params.id,
+            authData: authData
         }
-        else {
-            res.status(200).json(result)
-        }
+
+        const post = await this.postsServices.GetPostById(dto)
+
+        res.status(200).json(post)
     }
     catch (err) {next(err)}
 }
@@ -132,7 +132,6 @@ export class PostsController {
 }
 }
 
-export const postsController = new PostsController()
 
 
 

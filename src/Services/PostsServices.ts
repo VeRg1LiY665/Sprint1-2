@@ -6,15 +6,20 @@ import {PostDBType} from "../Data Types/PostDBType";
 import {BlogOutputType} from "../IO Types/BlogOutputType";
 import {CustomError, HttpStatuses, NotFoundError} from "../helpers/ErrorHandler";
 import {injectable} from "inversify";
+import {PostsQRepo} from "../Repositories/PostsQRepo";
+import {AuthServices} from "../Auth/Services/AuthService";
+import {LikesRepo} from "../Modules/Likes/LikesRepo/LikesRepo";
 
 @injectable()
 export class PostsServices {
-    private postsRepo = new PostsRepo();
-    private blogsQRepo = new BlogsQRepo();
-    constructor(){
-        this.postsRepo = new PostsRepo();
-        this.blogsQRepo = new BlogsQRepo();
-    }
+    constructor(
+        private postsRepo :  PostsRepo,
+        private blogsQRepo :  BlogsQRepo,
+        private postsQRepo :  PostsQRepo,
+        private authServices :  AuthServices,
+        private likesRepo: LikesRepo,
+)
+    {}
 
     async SetUpNewPost(content: InputPostType) {
         const foundBlog:BlogOutputType|null = await this.blogsQRepo.ShowBlogByID(content.blogId)
@@ -90,6 +95,57 @@ export class PostsServices {
         const foundPost = await this.postsRepo.ShowPostByID(id)
         if (foundPost===null) {throw new NotFoundError("Post not Found");}
         return await this.postsRepo.ChangePost(id, content)
+    }
+
+    GetPosts(dto:{
+        pageNumber:number,
+        pageSize:number,
+        sortBy: string,
+        sortDirection:number,
+        postId:string,
+        authData:string|undefined}) {
+
+    const posts = await this.postsQRepo.ShowCommentsForPost({
+        pageNumber:dto.pageNumber,
+        pageSize:dto.pageSize,
+        sortBy:dto.sortBy,
+        sortDirection:dto.sortDirection,
+        postId:dto.postId
+    })
+    const commentsCount = await this.postsQRepo.CommentsCounter(dto.postId)
+
+    if(dto.authData) {
+    const userData = await this.authServices.checkAccessToken(dto.authData)
+    for (let i = 0; i<commentsCount; i++) {
+    const reaction = await this.likesRepo.ShowReactionForComment(posts[i].commentatorInfo.userId, userData.userId.toString(), posts[i].id)
+    if(reaction) {posts[i].extendedLikesInfo.myStatus = reaction.status}
+}
+}
+
+const result = this.postsQRepo.PaginationMap(
+    {pageNumber:dto.pageNumber,
+        pageSize:dto.pageSize,
+        commentsCount:commentsCount,
+        comments:posts})
+
+return result
+    }
+
+    async GetPostById(dto:{id:string, authData:string|undefined}) {
+
+        const post = await this.postsQRepo.ShowPostByID(dto.id)
+        if (!post) {
+            throw new NotFoundError('Post not found')
+        }
+
+        if(dto.authData) {
+            const userData = await this.authServices.checkAccessToken(dto.authData)
+
+            const reaction = await this.likesRepo.ShowReactionForPost(userData.userId.toString(), post.id)
+            if(reaction) {post.extendedLikesInfo.myStatus = reaction.status}
+        }
+
+        return post
     }
 }
 
