@@ -389,7 +389,6 @@ describe('posts/postId/like-status', () => {
                 .send({likeStatus: 'Like'})
                 .expect(204)
 
-//TODO переделать запрос на эндпойнт blogs/:id/posts
         const Posts = await request(app)
             .get(SETTINGS.PATH.BLOGS + `/${blog.id}/posts`)
             .set('Authorization', `Bearer ` + ATokens[0])
