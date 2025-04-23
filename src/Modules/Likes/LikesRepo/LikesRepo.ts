@@ -1,6 +1,7 @@
 import {injectable} from "inversify";
 import {LikesDBType} from "../../../Data Types/LikesDBType";
 import {LikesModel} from "../../../db/mongoDB";
+import {NewestLike} from "../../../Data Types/PostDBType";
 
 @injectable()
 export class LikesRepo {
@@ -78,6 +79,7 @@ export class LikesRepo {
     }
 
     async ShowLastReactionsForPost(postId:string) {
+
         const res = await LikesModel
             .find({postId:postId})
             .sort({['addedAt'] : -1})

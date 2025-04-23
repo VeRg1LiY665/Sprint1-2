@@ -23,7 +23,7 @@ export class BlogsQRepo {
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
             .lean() // приводим к простому объекту
-            //.toArray();
+
 
         return AllBlogs.map(el=> (this.mapToOutput(el)))
     }

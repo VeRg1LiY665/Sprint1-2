@@ -105,7 +105,6 @@ export class PostsServices {
         searchNameTerm:string | null,
         authData:string|undefined}) {
 
-
     const posts = await this.postsQRepo.ShowAllPosts({
         pageNumber:dto.pageNumber,
         pageSize:dto.pageSize,

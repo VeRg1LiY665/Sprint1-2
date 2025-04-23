@@ -401,7 +401,7 @@ describe('posts/postId/like-status', () => {
 
     })
 
-    it('should create likes/dislikes for specific post by 4 different users, STATUS:200', async () => {
+    it('should create likes/dislikes for specific post by 4 different users and show last 3 reactions, STATUS:200', async () => {
         ATokens=[]
 
         const blog = await createBlog(app)
@@ -445,5 +445,48 @@ describe('posts/postId/like-status', () => {
             expect(Post.body.extendedLikesInfo.myStatus).toEqual((i%2==0) ? 'Like' : 'Dislike')
         }
 
+    })
+
+    it('should show last 3 reactions out of total 4 for specific post, STATUS:200', async () => {
+        ATokens=[]
+
+        const blog = await createBlog(app)
+        const newPost = await createPost(app, blog.id)
+        const users = await createUsers(app,3);  //create 4 users
+
+        for (let i = 0; i < 4; i++) {
+            const res = await request(app)
+                .post(SETTINGS.PATH.AUTH + '/login')
+                .set('user-agent', 'Agent' + i)
+                .send({
+                    loginOrEmail: `test${i}`,
+                    password: '12345678'
+                })
+                .expect(200);
+
+            expect(res.body.accessToken).toContain('.');
+            expect(res.headers['set-cookie']).toBeDefined();
+
+            ATokens.push(res.body.accessToken);
+        }
+
+        for (let i = 0; i < 4; i++ ) {
+            await request(app)
+                .put(SETTINGS.PATH.POSTS + `/${newPost.id}` + '/like-status')
+                .set('Authorization', `Bearer `+ATokens[i])
+                .send({likeStatus: (i%2==0) ? 'Like' : 'Dislike'})
+                .expect(204)
+        }
+
+        const resultingPost = await request(app)
+            .get(SETTINGS.PATH.POSTS + `/${newPost.id}`)
+            .expect(200)
+
+        expect(resultingPost.body.extendedLikesInfo.newestLikes.length).toEqual(3)
+console.log(resultingPost.body.extendedLikesInfo.newestLikes)
+        for (let i = 0; i<3; i++) {
+            let flag = resultingPost.body.extendedLikesInfo.newestLikes[i].userId !== users[0].id
+            expect(flag).toBe(true)
+        }
     })
 })

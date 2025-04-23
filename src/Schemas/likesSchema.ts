@@ -14,5 +14,6 @@ export const likesSchema = new mongoose.Schema<LikesDBType>({
     userId: String,
     parentId: String,
     commentId: String,
-    postId: String  //для лайков на посты
+    postId: String,  //для лайков на посты
+    addedAt: String,
 })

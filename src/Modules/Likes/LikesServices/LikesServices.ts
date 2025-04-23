@@ -64,7 +64,7 @@ protected usersRepo:UsersRepo,
                 dto.parentId,
                 '',
                 post._id.toString(),
-                new Date().toString(),
+                new Date().toString()
             )
 
             await this.likesRepo.CreateLikeEntity(newReaction)
@@ -82,14 +82,13 @@ protected usersRepo:UsersRepo,
                 const user = await this.usersRepo.ShowUser(lastLikes[i].parentId)
 
                 if (user!==null) {
-                    newestLikes[i] = new NewestLike(
+                    newestLikes[i] = new NewestLike(  //TODO разобраться какого собственно хрена оно добавляет _id?
                         lastLikes[i].addedAt,
                         lastLikes[i].parentId,
                         user.login
                     )
                 }
             }
-
 
             post.extendedLikesInfo.newestLikes = newestLikes;
         }
