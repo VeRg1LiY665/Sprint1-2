@@ -52,6 +52,7 @@ export class PostsQRepo {
             .sort({[dto.sortBy] : dto.sortDirection===1 ? 1 :-1})
             .skip((dto.pageNumber - 1) * dto.pageSize)
             .limit(dto.pageSize)
+            .lean()
 
         if (!posts) {
             return null

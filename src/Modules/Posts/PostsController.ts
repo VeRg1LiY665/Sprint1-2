@@ -32,8 +32,6 @@ export class PostsController {
             searchNameTerm,
             authData})
 
-        //const postsCount = await this.blogsQRepo.BlogsCounter(searchNameTerm)
-        //const result = this.postsQRepo.PaginationMap({pageNumber, pageSize, postsCount, posts})
         res.status(200).json(posts)
     }
         catch (err) {next(err)}
@@ -58,28 +56,23 @@ export class PostsController {
     async getPostsForBlog(req: Request, res: Response, next: NextFunction) {
     try {
         const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm} = paginationQueries(req)
-        const FoundBlog = await this.blogsQRepo.ShowBlogByID(req.params.id);
 
-        if (FoundBlog === null) {
-            throw new NotFoundError("Blog not Found");
-        } else {
-            const posts = await this.postsQRepo.ShowPostsForBlog({
+        const authData = req.headers.authorization
+
+            const posts = await this.postsServices.GetPostsForBlog({
                 pageNumber,
                 pageSize,
                 sortBy,
                 sortDirection,
                 searchNameTerm,
-                blogId: FoundBlog.id
+                blogId: req.params.id,
+                authData: authData
             })
 
-            if (posts === null) {
-                throw new NotFoundError("Post not Found");
-            } else {
-                const postsCount = await this.postsQRepo.PostsCounter(searchNameTerm, FoundBlog.id)
-                res.status(200).json(this.postsQRepo.PaginationMap({pageNumber, pageSize, postsCount, posts}))
+                res.status(200).json(posts)
             }
-        }
-    }
+
+
     catch (err) {next(err)}
 }
 

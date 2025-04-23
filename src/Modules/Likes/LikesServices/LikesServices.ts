@@ -31,7 +31,7 @@ protected usersRepo:UsersRepo,
             dto.parentId,
             comment._id.toString(),
             '',
-            new Date().toString(),
+            new Date().toISOString(),
         )
 
         await this.likesRepo.CreateLikeEntity(newReaction)
@@ -64,7 +64,7 @@ protected usersRepo:UsersRepo,
                 dto.parentId,
                 '',
                 post._id.toString(),
-                new Date().toString()
+                new Date().toISOString()
             )
 
             await this.likesRepo.CreateLikeEntity(newReaction)
@@ -82,7 +82,7 @@ protected usersRepo:UsersRepo,
                 const user = await this.usersRepo.ShowUser(lastLikes[i].parentId)
 
                 if (user!==null) {
-                    newestLikes[i] = new NewestLike(  //TODO разобраться какого собственно хрена оно добавляет _id?
+                    newestLikes[i] = new NewestLike(
                         lastLikes[i].addedAt,
                         lastLikes[i].parentId,
                         user.login

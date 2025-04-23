@@ -81,7 +81,12 @@ export class LikesRepo {
     async ShowLastReactionsForPost(postId:string) {
 
         const res = await LikesModel
-            .find({postId:postId})
+            .find({
+                $and:[
+                    {postId:postId},
+                    {status: 'Like'}
+            ]}
+            )
             .sort({['addedAt'] : -1})
             .limit(3)
             .lean()

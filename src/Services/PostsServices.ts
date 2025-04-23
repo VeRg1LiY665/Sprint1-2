@@ -147,6 +147,51 @@ return result
 
         return post
     }
+
+    async GetPostsForBlog(dto:{
+        pageNumber:number,
+        pageSize:number,
+        sortBy: string,
+        sortDirection:number,
+        searchNameTerm:string | null,
+        blogId:string,
+        authData:string|undefined}) {
+
+        const FoundBlog = await this.blogsQRepo.ShowBlogByID(dto.blogId);
+
+        if (!FoundBlog) {throw new NotFoundError("Blog not Found");}
+
+        const posts = await this.postsQRepo.ShowPostsForBlog({
+            pageNumber:dto.pageNumber,
+            pageSize:dto.pageSize,
+            sortBy:dto.sortBy,
+            sortDirection:dto.sortDirection,
+            searchNameTerm:dto.searchNameTerm,
+            blogId: FoundBlog.id
+        })
+
+        if (posts === null) {
+            throw new NotFoundError("Posts not Found");
+        }
+
+        const postsCount = await this.postsQRepo.PostsCounter(dto.searchNameTerm, FoundBlog.id)
+
+        if(dto.authData) {
+            const userData = await this.authServices.checkAccessToken(dto.authData)
+            for (let i = 0; i<postsCount; i++) {
+                const reaction = await this.likesRepo.ShowReactionForPost(userData.userId.toString(), posts[i].id)
+                if(reaction) {posts[i].extendedLikesInfo.myStatus = reaction.status}
+            }
+        }
+
+        const result = this.postsQRepo.PaginationMap(
+            {pageNumber:dto.pageNumber,
+                pageSize:dto.pageSize,
+                postsCount:postsCount,
+                posts:posts})
+
+        return result
+    }
 }
 
 

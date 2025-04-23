@@ -1,4 +1,4 @@
-import {req} from './test-helpers'
+import {delay, req} from './test-helpers'
 import {SETTINGS} from '../src/settings'
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {DB} from "../src/db/mongoDB";
@@ -389,9 +389,9 @@ describe('posts/postId/like-status', () => {
                 .send({likeStatus: 'Like'})
                 .expect(204)
 
-
+//TODO переделать запрос на эндпойнт blogs/:id/posts
         const Posts = await request(app)
-            .get(SETTINGS.PATH.POSTS)
+            .get(SETTINGS.PATH.BLOGS + `/${blog.id}/posts`)
             .set('Authorization', `Bearer ` + ATokens[0])
             .expect(200)
 
@@ -483,7 +483,7 @@ describe('posts/postId/like-status', () => {
             .expect(200)
 
         expect(resultingPost.body.extendedLikesInfo.newestLikes.length).toEqual(3)
-console.log(resultingPost.body.extendedLikesInfo.newestLikes)
+
         for (let i = 0; i<3; i++) {
             let flag = resultingPost.body.extendedLikesInfo.newestLikes[i].userId !== users[0].id
             expect(flag).toBe(true)
