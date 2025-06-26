@@ -26,7 +26,7 @@ export class PostsServices {
     if (!foundBlog){throw new CustomError (
         'Invalid blog ID',
         HttpStatuses.BadRequest,
-        [{message: 'Blog with stated lodId does not exist', field: 'blogId'}]
+        [{message: 'Blog with stated blogId does not exist', field: 'blogId'}]
     )}
         const post = new PostDBType(
             new ObjectId(),
